@@ -1,1 +1,1 @@
-# discoverwithleigh
+Placeholder repo to create a static website away from WordPress. 
