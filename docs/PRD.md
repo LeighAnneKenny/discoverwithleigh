@@ -52,6 +52,10 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 The current header/hero uses a hand-drawn approximation of the logo's aperture device. Requirement: capture the existing logo as faithfully as possible — preferably by tracing the original (`src/assets/logo.png` / the aperture favicon) into a true SVG — so the mark is identical to the brand asset and can be animated on initial page load (e.g. iris blades opening). Fallback: a cleaned-up raster with a CSS-animated reveal.
 
+## Admin v2 (feedback, 2026-07-06)
+
+The v1 admin edits existing values only. Wanted next: add/remove items in list content (reviews, services, process steps), and longer-term add/remove/reorder whole sections. "We could do A LOT MORE here" — Caveshen.
+
 ## Non-goals (v1)
 
 Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid is curated via admin instead).
