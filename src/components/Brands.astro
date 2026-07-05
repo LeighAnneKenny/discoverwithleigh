@@ -1,0 +1,49 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Eyebrow from './Eyebrow.astro';
+
+const logos = Object.values(
+  import.meta.glob<{ default: ImageMetadata }>('../assets/brands/*', { eager: true }),
+).map((m) => m.default);
+---
+<section class="section" id="brands">
+  <div class="wrap reveal">
+    <Eyebrow>Trusted collaborations</Eyebrow>
+    <h2 class="section-heading">Brands I’ve worked with</h2>
+  </div>
+  <div class="brand-strip reveal" aria-label="Client brand logos">
+    {logos.map((logo) => (
+      <div class="brand-tile">
+        <Image src={logo} alt="" width={220} />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .brand-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 1px;
+    margin-top: 1rem;
+  }
+  .brand-tile {
+    background: var(--ink);
+    box-shadow: 0 0 0 1px var(--line);
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    padding: 1.4rem;
+  }
+  .brand-tile :global(img) {
+    max-width: 100%;
+    filter: grayscale(1) brightness(1.6);
+    opacity: 0.75;
+    transition: filter 0.3s, opacity 0.3s;
+  }
+  .brand-tile:hover :global(img) {
+    filter: none;
+    opacity: 1;
+  }
+</style>

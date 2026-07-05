@@ -1,0 +1,10 @@
+---
+// The aperture device from the brand logo — six iris blades.
+const { class: className } = Astro.props;
+---
+<svg class={className} viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" aria-hidden="true">
+  <circle cx="50" cy="50" r="44" stroke-width="9" />
+  {[0, 60, 120, 180, 240, 300].map((deg) => (
+    <line x1="50" y1="12" x2="69" y2="45" transform={`rotate(${deg} 50 50)`} />
+  ))}
+</svg>

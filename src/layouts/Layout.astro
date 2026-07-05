@@ -1,0 +1,243 @@
+---
+import '@fontsource-variable/montserrat';
+import '@fontsource-variable/nunito-sans';
+import '../styles/global.css';
+import Aperture from '../components/Aperture.astro';
+import { meta, nav, socials, contact } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = meta.title, description = meta.description } = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, meta.url)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, meta.url)} />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <header class="site-header" id="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/#top" aria-label="Discover With Leigh — home">
+          <Aperture class="brand-mark" />
+          <span>Discover <em>with</em> Leigh</span>
+        </a>
+        <nav class="site-nav" id="site-nav" aria-label="Main">
+          <ul>
+            {nav.map((item) => (
+              <li><a href={`/${item.href}`}>{item.label}</a></li>
+            ))}
+          </ul>
+        </nav>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+          <span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <ul class="footer-socials" aria-label="Social media">
+          {socials.map((s) => (
+            <li><a href={s.url} target="_blank" rel="noopener">{s.name}</a></li>
+          ))}
+        </ul>
+        <p>
+          &copy; {new Date().getFullYear()} Discover With Leigh &middot;
+          <a href="/privacy-policy">Privacy Policy</a> &middot;
+          <a href={`mailto:${contact.email}`}>{contact.email}</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // header state + mobile nav
+      const header = document.getElementById('site-header')!;
+      const toggle = document.getElementById('nav-toggle')!;
+      const onScroll = () => header.toggleAttribute('data-scrolled', window.scrollY > 24);
+      onScroll();
+      addEventListener('scroll', onScroll, { passive: true });
+      toggle.addEventListener('click', () => {
+        const open = header.toggleAttribute('data-open');
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      header.querySelectorAll('.site-nav a').forEach((a) =>
+        a.addEventListener('click', () => {
+          header.removeAttribute('data-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }),
+      );
+
+      // scroll reveal
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }
+        },
+        { rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+
+    <style>
+      .site-header {
+        position: fixed;
+        inset-inline: 0;
+        top: 0;
+        z-index: 50;
+        transition: background-color 0.3s;
+      }
+      .site-header[data-scrolled] {
+        background: color-mix(in srgb, var(--ink) 88%, transparent);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 4.25rem;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-family: var(--font-display);
+        font-size: 1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--paper);
+      }
+      .brand em {
+        font-style: normal;
+        color: var(--teal);
+      }
+      .brand :global(.brand-mark) {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: var(--teal);
+      }
+      .site-nav ul {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+      .site-nav a {
+        font-family: var(--font-label);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--paper);
+        transition: color 0.2s;
+      }
+      .site-nav a:hover {
+        color: var(--teal-hi);
+      }
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        background: none;
+        border: 0;
+        padding: 0.5rem;
+        cursor: pointer;
+      }
+      .nav-toggle span {
+        width: 26px;
+        height: 2px;
+        background: var(--paper);
+        transition: rotate 0.25s, translate 0.25s;
+      }
+      @media (max-width: 760px) {
+        .nav-toggle {
+          display: flex;
+        }
+        .site-nav {
+          position: fixed;
+          inset: 4.25rem 0 auto 0;
+          background: var(--ink);
+          border-bottom: 1px solid var(--line);
+          padding: 1.5rem var(--gutter) 2rem;
+          display: none;
+        }
+        .site-header[data-open] {
+          background: var(--ink);
+        }
+        .site-header[data-open] .site-nav {
+          display: block;
+        }
+        .site-header[data-open] .nav-toggle span:first-child {
+          rotate: 45deg;
+          translate: 0 4px;
+        }
+        .site-header[data-open] .nav-toggle span:last-child {
+          rotate: -45deg;
+          translate: 0 -4px;
+        }
+        .site-nav ul {
+          flex-direction: column;
+          gap: 1.25rem;
+        }
+      }
+
+      .site-footer {
+        border-top: 1px solid var(--line);
+        padding-block: 2.5rem;
+      }
+      .footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--mist);
+      }
+      .footer-socials {
+        display: flex;
+        gap: 1.4rem;
+        list-style: none;
+      }
+      .footer-socials a {
+        font-family: var(--font-label);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--mist);
+        transition: color 0.2s;
+      }
+      .footer-socials a:hover {
+        color: var(--teal-hi);
+      }
+      .site-footer p a {
+        color: var(--mist);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .site-footer p a:hover {
+        color: var(--teal-hi);
+      }
+    </style>
+  </body>
+</html>

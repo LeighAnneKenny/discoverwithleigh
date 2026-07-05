@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import { contact } from '../data/site';
+---
+<Layout title="Privacy Policy | Discover With Leigh" description="How Discover With Leigh collects, uses, and protects your personal information.">
+  <section class="section policy">
+    <div class="wrap">
+      <Eyebrow>Legal</Eyebrow>
+      <h1 class="section-heading">Privacy Policy</h1>
+      <p class="lede">
+        Discover with Leigh is committed to protecting the privacy and security of personal information collected from
+        visitors to our website. This Privacy Policy outlines how we collect, use, disclose, and protect information
+        gathered through our website.
+      </p>
+
+      <h2>Information we collect</h2>
+      <p>
+        <strong>Personal information:</strong> we may collect personal information such as names, email addresses or
+        phone numbers, voluntarily provided by visitors through online forms, registration processes or email
+        communications.
+      </p>
+      <p>
+        <strong>Automatically collected information:</strong> we may also collect certain information automatically when
+        you visit our website, including your IP address, browser type, operating system, and browsing behaviour using
+        cookies and similar technologies.
+      </p>
+
+      <h2>How we use information</h2>
+      <p>We may use the personal information we collect to:</p>
+      <ul>
+        <li>Provide, operate, and maintain our website and services</li>
+        <li>Improve, personalise, and expand our website and services</li>
+        <li>Communicate with you, including customer service, updates, and marketing</li>
+        <li>Process your transactions and manage your orders</li>
+        <li>Understand and analyse how you use our website and services</li>
+        <li>Develop new products, services, and features</li>
+      </ul>
+
+      <h2>Sharing your information</h2>
+      <p>We may share your information with third parties in the following situations:</p>
+      <ul>
+        <li>With service providers who perform services on our behalf</li>
+        <li>To comply with legal obligations, such as responding to a subpoena or court order</li>
+        <li>To protect and defend our rights and property</li>
+        <li>With your consent or at your direction</li>
+      </ul>
+
+      <h2>Data security</h2>
+      <p>
+        We implement reasonable security measures to protect personal information from unauthorised access, disclosure,
+        alteration, or destruction. However, no method of transmission over the internet or electronic storage is
+        completely secure, and we cannot guarantee absolute security.
+      </p>
+
+      <h2>Cookies and tracking technologies</h2>
+      <p>
+        We use cookies and similar tracking technologies to track the activity on our website and hold certain
+        information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
+      </p>
+
+      <h2>Third-party links</h2>
+      <p>
+        Our website may contain links to third-party websites or services not operated or controlled by us. We are not
+        responsible for the privacy practices or content of such third-party sites and encourage visitors to review
+        their privacy policies.
+      </p>
+
+      <h2>Updates to this policy</h2>
+      <p>
+        We reserve the right to update or modify this Privacy Policy at any time without prior notice. Any changes will
+        be effective immediately upon posting the updated policy on our website.
+      </p>
+
+      <h2>Contact us</h2>
+      <p>
+        If you have any questions or concerns about our Privacy Policy or the handling of your personal information,
+        please send a message to <a href={contact.phoneHref}>{contact.phone}</a>.
+      </p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .policy {
+    padding-top: calc(var(--section-pad) + 3rem);
+  }
+  .policy h2 {
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
+    margin: 2.4rem 0 0.8rem;
+    color: var(--teal);
+  }
+  .policy p,
+  .policy ul {
+    max-width: var(--measure);
+    color: var(--mist);
+    margin-bottom: 0.8rem;
+  }
+  .policy ul {
+    padding-left: 1.4rem;
+  }
+  .policy strong {
+    color: var(--paper);
+  }
+</style>

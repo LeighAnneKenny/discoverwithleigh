@@ -1,0 +1,76 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import { video } from '../data/site';
+---
+<section class="section" id="video">
+  <div class="wrap video-grid">
+    <div class="reveal">
+      <Eyebrow>{video.eyebrow}</Eyebrow>
+      <h2 class="section-heading">{video.heading}</h2>
+      {video.body.map((p) => <p class="lede">{p}</p>)}
+    </div>
+    <div class="tiktoks reveal" id="tiktoks">
+      {video.tiktokIds.map((id) => (
+        <blockquote
+          class="tiktok-embed"
+          cite={`https://www.tiktok.com/@discover_with_leigh/video/${id}`}
+          data-video-id={id}
+        >
+          <section>
+            <a href={`https://www.tiktok.com/@discover_with_leigh/video/${id}`} target="_blank" rel="noopener">
+              Watch on TikTok — @discover_with_leigh
+            </a>
+          </section>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Load TikTok's embed script only when the section approaches the viewport.
+  const target = document.getElementById('tiktoks')!;
+  const io = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        const s = document.createElement('script');
+        s.src = 'https://www.tiktok.com/embed.js';
+        s.async = true;
+        document.body.appendChild(s);
+        io.disconnect();
+      }
+    },
+    { rootMargin: '400px' },
+  );
+  io.observe(target);
+</script>
+
+<style>
+  .video-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .tiktoks {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  .tiktoks :global(.tiktok-embed) {
+    margin: 0;
+    max-width: 325px;
+    min-width: 0;
+    flex: 1 1 0;
+    min-height: 575px;
+    background: var(--ink-2);
+  }
+  @media (max-width: 900px) {
+    .video-grid {
+      grid-template-columns: 1fr;
+    }
+    .tiktoks {
+      flex-wrap: wrap;
+    }
+  }
+</style>

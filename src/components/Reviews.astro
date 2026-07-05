@@ -1,0 +1,71 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import { reviews } from '../data/site';
+---
+<section class="section" id="reviews">
+  <div class="wrap">
+    <div class="reveal">
+      <Eyebrow>Client reviews</Eyebrow>
+      <h2 class="section-heading">Kind words from good people</h2>
+    </div>
+    <div class="quotes">
+      {reviews.map((r) => (
+        <blockquote class="quote reveal">
+          <p>{r.quote}</p>
+          <footer>
+            <cite>{r.name}</cite>
+            {r.org && <span>{r.org}</span>}
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .quotes {
+    columns: 2 24rem;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .quote {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--line);
+    padding: 2rem 1.8rem;
+    position: relative;
+  }
+  .quote::before {
+    content: '\201C';
+    font-family: var(--font-display);
+    font-size: 3.4rem;
+    line-height: 0;
+    color: var(--teal);
+    display: block;
+    margin-block: 1.2rem 0.6rem;
+  }
+  .quote p {
+    color: var(--paper);
+    font-size: 1rem;
+  }
+  .quote footer {
+    margin-top: 1.4rem;
+  }
+  .quote cite {
+    display: block;
+    font-style: normal;
+    font-family: var(--font-label);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .quote span {
+    font-family: var(--font-label);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+</style>

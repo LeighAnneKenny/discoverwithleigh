@@ -1,17 +1,29 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Gallery from '../components/Gallery.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Video from '../components/Video.astro';
+import Marketing from '../components/Marketing.astro';
+import Influencer from '../components/Influencer.astro';
+import Reviews from '../components/Reviews.astro';
+import Brands from '../components/Brands.astro';
+import Contact from '../components/Contact.astro';
+import { photography, video, marketing, influencer } from '../data/site';
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <Hero />
+  <About />
+  <Gallery />
+  <CtaBand line={photography.cta.line} label={photography.cta.label} />
+  <Video />
+  <CtaBand line={video.cta.line} label={video.cta.label} />
+  <Marketing />
+  <CtaBand line={marketing.cta.line} label={marketing.cta.label} />
+  <Influencer />
+  <CtaBand line={influencer.cta.line} label={influencer.cta.label} />
+  <Reviews />
+  <Brands />
+  <Contact />
+</Layout>

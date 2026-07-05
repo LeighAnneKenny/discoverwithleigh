@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import Eyebrow from './Eyebrow.astro';
+import bg from '../assets/bg-influencer.jpg';
+import { influencer } from '../data/site';
+---
+<section class="section" id="influencer">
+  <div class="wrap influencer-grid">
+    <div class="reveal">
+      <Eyebrow>{influencer.eyebrow}</Eyebrow>
+      <h2 class="section-heading">{influencer.heading}</h2>
+      {influencer.body.map((p) => <p class="lede">{p}</p>)}
+    </div>
+    <figure class="influencer-figure reveal">
+      <Image src={bg} alt="Leigh-Anne creating influencer content on location" widths={[480, 760, 1100]} sizes="(max-width: 900px) 92vw, 44vw" />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .influencer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .influencer-figure {
+    position: relative;
+  }
+  .influencer-figure::before {
+    content: '';
+    position: absolute;
+    inset: -1.25rem 1.25rem 1.25rem -1.25rem;
+    border: 1px solid var(--teal);
+    z-index: -1;
+  }
+  @media (max-width: 900px) {
+    .influencer-grid {
+      grid-template-columns: 1fr;
+    }
+    .influencer-figure {
+      max-width: 26rem;
+    }
+  }
+</style>

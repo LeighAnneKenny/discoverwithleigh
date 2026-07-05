@@ -1,0 +1,183 @@
+/* ---- Discover With Leigh — design tokens ---- */
+
+@font-face {
+  font-family: 'Vogue Sans';
+  src: url('/fonts/vogue-sans-medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  --ink: #0b0d0d;
+  --ink-2: #131716;
+  --line: #242b29;
+  --paper: #f2f1ec;
+  --mist: #97a09c;
+  --teal: #00a79d;
+  --teal-hi: #2bd9cd;
+
+  --font-display: 'Vogue Sans', 'Montserrat Variable', sans-serif;
+  --font-body: 'Nunito Sans Variable', sans-serif;
+  --font-label: 'Montserrat Variable', sans-serif;
+
+  --measure: 62ch;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --section-pad: clamp(5rem, 12vh, 8.5rem);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+a {
+  color: var(--teal-hi);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal-hi);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--teal);
+  color: var(--ink);
+}
+
+/* ---- shared primitives ---- */
+
+.wrap {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--section-pad);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.1rem;
+}
+
+.eyebrow svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+}
+
+.section-heading {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  max-width: 22ch;
+  margin-bottom: 1.6rem;
+}
+
+.lede {
+  color: var(--mist);
+  max-width: var(--measure);
+}
+
+.lede + .lede {
+  margin-top: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  font-family: var(--font-label);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--paper);
+  border: 1px solid var(--teal);
+  padding: 0.95rem 2.1rem;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.btn:hover {
+  background: var(--teal);
+  color: var(--ink);
+}
+
+/* CTA band between sections */
+.cta-band {
+  border-block: 1px solid var(--line);
+  padding-block: clamp(2.5rem, 6vh, 4rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.cta-band p {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  max-width: 26ch;
+}
+
+/* ---- scroll reveal ---- */
+
+.reveal {
+  opacity: 0;
+  translate: 0 18px;
+  transition: opacity 0.7s ease, translate 0.7s ease;
+}
+
+.reveal.in {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
