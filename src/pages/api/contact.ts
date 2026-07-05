@@ -3,10 +3,6 @@ import { env } from 'cloudflare:workers';
 
 export const prerender = false;
 
-// ponytail: falls back to the Turnstile always-pass test secret until the real
-// widget exists — no worse than the old WP form, which delivered to /dev/null.
-const TEST_SECRET = '1x0000000000000000000000000000000AA';
-
 export const POST: APIRoute = async ({ request, redirect }) => {
   const data = await request.formData();
   const field = (name: string) => String(data.get(name) ?? '').trim();
@@ -17,7 +13,8 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
     body: new URLSearchParams({
-      secret: env.TURNSTILE_SECRET ?? TEST_SECRET,
+      // fail closed: a missing Worker secret must never mean unverified submissions
+      secret: env.TURNSTILE_SECRET ?? '',
       response: field('cf-turnstile-response'),
       remoteip: request.headers.get('CF-Connecting-IP') ?? '',
     }),
