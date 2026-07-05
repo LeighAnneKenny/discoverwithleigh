@@ -1,6 +1,9 @@
 ---
 import Eyebrow from './Eyebrow.astro';
 import { contact, socials } from '../data/site';
+
+// Turnstile always-pass test sitekey until the real widget exists.
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '1x00000000000000000000AA';
 ---
 <section class="section" id="contact">
   <div class="wrap contact-grid">
@@ -27,6 +30,9 @@ import { contact, socials } from '../data/site';
       <p class="form-status" id="form-status" role="status" hidden>
         Thank you — your message is on its way. I’ll get back to you soon!
       </p>
+      <p class="form-status form-error" id="form-error" role="alert" hidden>
+        Something went wrong sending your message. Please try again, or reach me on WhatsApp or email instead.
+      </p>
       <div class="form-row">
         <label>First name<input name="firstName" required autocomplete="given-name" /></label>
         <label>Last name<input name="lastName" required autocomplete="family-name" /></label>
@@ -35,14 +41,24 @@ import { contact, socials } from '../data/site';
       <label>Contact number<input name="phone" type="tel" autocomplete="tel" /></label>
       <label>Message<textarea name="message" rows="5" required></textarea></label>
       <input class="trap" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div
+        class="cf-turnstile"
+        data-sitekey={turnstileSiteKey}
+        data-action="turnstile-spin-v1"
+        data-theme="dark"
+      ></div>
       <button class="btn" type="submit">Send message</button>
     </form>
   </div>
 </section>
 
+<script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <script>
-  if (new URLSearchParams(location.search).has('sent')) {
-    document.getElementById('form-status')!.hidden = false;
+  const params = new URLSearchParams(location.search);
+  const banner = params.has('sent') ? 'form-status' : params.has('error') ? 'form-error' : null;
+  if (banner) {
+    document.getElementById(banner)!.hidden = false;
     document.getElementById('contact')!.scrollIntoView();
   }
 </script>
@@ -138,6 +154,10 @@ import { contact, socials } from '../data/site';
     color: var(--teal-hi);
     padding: 0.9rem 1.1rem;
     font-size: 0.95rem;
+  }
+  .form-error {
+    border-color: #c4544d;
+    color: #e08a84;
   }
   .contact-form .btn {
     justify-self: start;

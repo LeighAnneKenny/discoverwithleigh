@@ -23,7 +23,7 @@ Replace the static WordPress/Divi export with a fast, owned, editable site — s
 | Images | R2, resized on upload |
 | Admin auth | Cloudflare Access on `/admin` |
 | Spam protection | Cloudflare Turnstile |
-| Enquiry email | Resend free tier (+ D1 as backup, visible in admin) |
+| Enquiry email | Cloudflare Email Sending — Worker binding, no third party. Sends to Leigh's verified destination address are quota-free on all plans. (Supersedes Resend, 2026-07-05.) |
 | CI/CD | GitHub Actions → `wrangler deploy` on push to main |
 
 ## Brand
@@ -67,4 +67,5 @@ Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid
 ## Pending external tasks
 
 - GH repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (before first CI deploy).
-- Resend domain verification: two DNS records in Cloudflare DNS (before enquiry email goes live).
+- Turnstile: create the real widget (dashboard, or API token with `Account.Turnstile:Edit`); set `TURNSTILE_SECRET` worker secret + `PUBLIC_TURNSTILE_SITEKEY` build var. Test always-pass keys in use until then.
+- Email Sending: onboard `discoverwithleigh.co.za` (`wrangler email sending enable`, needs suitable token or dashboard) and verify Leigh's inbox as a destination address (she clicks one confirmation email).

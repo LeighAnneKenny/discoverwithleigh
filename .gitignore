@@ -31,3 +31,5 @@ coverage
 .astro/
 .wrangler/
 .env
+.dev.vars
+worker-configuration.d.ts

@@ -3,7 +3,16 @@
 	"compatibility_date": "2026-07-05",
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "discoverwithleigh",
+	"account_id": "7bab08e0bdbd9b52f1b05464feceb2d3",
 	"main": "@astrojs/cloudflare/entrypoints/server",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "discoverwithleigh",
+			"database_id": "0b81c2eb-5926-41b4-8d25-2ad0a9da3efe"
+		}
+	],
+	"send_email": [{ "name": "EMAIL" }],
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"
