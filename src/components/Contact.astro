@@ -2,8 +2,8 @@
 import Eyebrow from './Eyebrow.astro';
 import { contact, socials } from '../data/site';
 
-// Turnstile always-pass test sitekey until the real widget exists.
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '1x00000000000000000000AA';
+// Sitekeys are public identifiers; the secret lives only as a Worker secret.
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAADwIcHofRL-bGbeM';
 ---
 <section class="section" id="contact">
   <div class="wrap contact-grid">
