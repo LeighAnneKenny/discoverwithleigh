@@ -56,6 +56,12 @@ The current header/hero uses a hand-drawn approximation of the logo's aperture d
 
 The v1 admin edits existing values only. Wanted next: add/remove items in list content (reviews, services, process steps), and longer-term add/remove/reorder whole sections. "We could do A LOT MORE here" — Caveshen.
 
+## AI & search discoverability (feedback, 2026-07-06)
+
+The site should be findable and summarisable by search engines *and* LLM crawlers — the goal is appearing when someone asks an assistant for photographers / digital marketers in Cape Town. Welcome crawlers; block nothing that reads politely. What we prevent is abuse, not access: no full-site scraping abuse or DDoS (Cloudflare's free unmetered DDoS protection covers the latter; add a WAF rate-limiting rule at cutover).
+
+Implementation: robots.txt (allow all, disallow /admin + /api, sitemap reference), /llms.txt business summary, JSON-LD ProfessionalService structured data on the homepage, sitemap.xml. At cutover: ensure Cloudflare's "Block AI bots" / AI Crawl Control is set to ALLOW AI crawlers on this zone — Cloudflare blocks them by default on newer zones.
+
 ## Non-goals (v1)
 
 Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid is curated via admin instead).

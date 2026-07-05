@@ -15,8 +15,29 @@ import { loadContent, loadGallery, loadBrands } from '../lib/content';
 export const prerender = false;
 
 const [c, gallery, brands] = await Promise.all([loadContent(), loadGallery(), loadBrands()]);
+
+// Structured data for search engines and LLM crawlers
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Discover With Leigh',
+  description: c.meta.description,
+  url: c.meta.url,
+  telephone: c.contact.phone,
+  email: c.contact.email,
+  address: { '@type': 'PostalAddress', addressLocality: 'Century City, Cape Town', addressCountry: 'ZA' },
+  areaServed: 'Cape Town, South Africa',
+  knowsAbout: [...c.services],
+  sameAs: [
+    'https://www.instagram.com/discover_with_leigh/',
+    'https://www.tiktok.com/@discover_with_leigh',
+    'https://www.facebook.com/leighannekennyza',
+    'https://www.youtube.com/channel/UCjyVZP6593CcIpepfOIKs1w',
+  ],
+};
 ---
 <Layout title={c.meta.title} description={c.meta.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <Hero hero={c.hero} />
   <About about={c.about} services={c.services} />
   <Gallery photography={c.photography} items={gallery} />
