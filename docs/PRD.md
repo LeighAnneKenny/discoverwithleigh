@@ -48,13 +48,19 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 | 8 | Developer deploys | Push to main → live in < 5 min; rollback = `git revert` |
 | 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept |
 
-## Brand mark fidelity (feedback, 2026-07-05)
+## Brand mark fidelity (feedback, 2026-07-05; expanded 2026-07-06)
 
-The current header/hero uses a hand-drawn approximation of the logo's aperture device. Requirement: capture the existing logo as faithfully as possible — preferably by tracing the original (`src/assets/logo.png` / the aperture favicon) into a true SVG — so the mark is identical to the brand asset and can be animated on initial page load (e.g. iris blades opening). Fallback: a cleaned-up raster with a CSS-animated reveal.
+The current header/hero uses a hand-drawn approximation of the logo's aperture device. Requirement: capture the existing logo as faithfully as possible — preferably by tracing the original (`src/assets/logo.png` / the aperture favicon) into a true SVG — so the mark is identical to the brand asset and can be animated on initial page load. The animation must read as a **camera shutter/iris closing-and-opening** (blades sweeping in toward centre, then apart) — the current rotate-in reads as a *wheel turning*, which is the wrong metaphor for a photography brand. Fallback: a cleaned-up raster with a CSS-animated reveal.
 
 ## Admin v2 (feedback, 2026-07-06)
 
-The v1 admin edits existing values only. Wanted next: add/remove items in list content (reviews, services, process steps), and longer-term add/remove/reorder whole sections. "We could do A LOT MORE here" — Caveshen.
+The v1 admin edits existing values only. Wanted next: add/remove items in list content (reviews, services, process steps), and longer-term add/remove/reorder whole sections of the site — scope to be workshopped before build. "We could do A LOT MORE here" — Caveshen.
+
+## Next run (feedback, 2026-07-06)
+
+1. **Gallery → filterable carousel (mobile-first).** The 53-image masonry punishes phone users: it collapses to one column and forces an enormous scroll between sections. Replace with a CSS scroll-snap horizontal carousel (native swipe on mobile, prev/next arrows on desktop, no carousel library), filter tabs above styled unmistakably as tabs. This also restores the original site's form. *(The filter click-handling bug — author `display:block` overriding the `hidden` attribute — was found and fixed 2026-07-06.)*
+2. **Floating WhatsApp CTA.** Reintroduce the bottom-right floating WhatsApp button from the old site, opening a chat with pre-filled message text (e.g. "Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.") via wa.me/27722277016?text=…. Message copy editable in admin content.
+3. **Brands strip revisit.** v2 made it a full-bleed logo wall, breaking section width conventions. Decide: auto-scrolling marquee carousel (full width becomes intentional; pause on hover, respect reduced-motion) or a contained static grid inside standard width. Recommendation: marquee. Decision pending workshop.
 
 ## AI & search discoverability (feedback, 2026-07-06)
 
