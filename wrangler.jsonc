@@ -13,6 +13,10 @@
 		}
 	],
 	"send_email": [{ "name": "EMAIL" }],
+	"vars": {
+		// ponytail: placeholder recipient — swap when Leigh confirms her preferred inbox
+		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com"
+	},
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"

@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { contact } from '../../data/site';
 
 export const prerender = false;
 
@@ -42,7 +41,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   // Email is best-effort — the enquiry is already safe in D1.
   try {
     await env.EMAIL.send({
-      to: contact.email,
+      to: env.ENQUIRY_EMAIL,
       from: { email: 'enquiries@discoverwithleigh.co.za', name: 'Discover With Leigh' },
       replyTo: email,
       subject: `New enquiry from ${firstName} ${lastName}`,
