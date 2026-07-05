@@ -19,12 +19,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const token = context.request.headers.get('Cf-Access-Jwt-Assertion');
   const team = env.ACCESS_TEAM_DOMAIN;
-  if (!token || !team || !env.ACCESS_AUD) return new Response('Forbidden', { status: 403 });
+  if (!token || !team || !env.ACCESS_AUD) {
+    console.error('admin denied:', { hasToken: !!token, hasTeam: !!team, hasAud: !!env.ACCESS_AUD });
+    return new Response('Forbidden', { status: 403 });
+  }
 
   try {
     jwks ??= createRemoteJWKSet(new URL(`${team}/cdn-cgi/access/certs`));
     await jwtVerify(token, jwks, { issuer: team, audience: env.ACCESS_AUD });
-  } catch {
+  } catch (err) {
+    console.error('admin JWT rejected:', err instanceof Error ? `${err.name}: ${err.message}` : String(err));
     return new Response('Forbidden', { status: 403 });
   }
   return next();
