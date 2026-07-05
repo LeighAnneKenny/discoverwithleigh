@@ -5,6 +5,12 @@
 	"name": "discoverwithleigh",
 	"account_id": "7bab08e0bdbd9b52f1b05464feceb2d3",
 	"main": "@astrojs/cloudflare/entrypoints/server",
+	"routes": [
+		{
+			"pattern": "preview.discoverwithleigh.co.za",
+			"custom_domain": true
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -22,8 +28,8 @@
 	"vars": {
 		// ponytail: placeholder recipient — swap when Leigh confirms her preferred inbox
 		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com",
-		// Cloudflare Access config for /admin — empty means admin is locked (fail closed)
-		"ACCESS_TEAM_DOMAIN": "",
+		// Cloudflare Access config for /admin — empty AUD means admin is locked (fail closed)
+		"ACCESS_TEAM_DOMAIN": "https://ancient-water-ea57.cloudflareaccess.com",
 		"ACCESS_AUD": ""
 	},
 	"assets": {
