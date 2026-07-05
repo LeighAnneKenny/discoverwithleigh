@@ -1,10 +1,43 @@
 ---
-// The aperture device from the brand logo — six iris blades.
+// Faithful trace of the brand aperture: teal disc, seven swirling blades,
+// open centre. Parametric so the geometry can be tuned against the original.
 const { class: className } = Astro.props;
+
+const N = 7;        // blade count (matches the logo)
+const C = 50;       // centre
+const R = 48;       // disc radius
+const r0 = 17;      // centre opening radius
+const swirl = 50;   // degrees the seams sweep as they travel inward
+const gap = 2;      // half-gap between blades, degrees at the rim
+const step = 360 / N;
+
+const rad = (d: number) => (d * Math.PI) / 180;
+const pt = (deg: number, radius: number) => [C + radius * Math.cos(rad(deg)), C + radius * Math.sin(rad(deg))] as const;
+const f = (n: number) => n.toFixed(2);
+
+const blades = Array.from({ length: N }, (_, i) => {
+  const a1 = i * step + gap;
+  const a2 = (i + 1) * step - gap;
+  const [x1, y1] = pt(a1, R);
+  const [x2, y2] = pt(a2, R);
+  const [ix2, iy2] = pt(a2 + swirl, r0);
+  const [ix1, iy1] = pt(a1 + swirl, r0);
+  const midR = (R + r0) * 0.56;
+  const [c2x, c2y] = pt(a2 + swirl * 0.45, midR);
+  const [c1x, c1y] = pt(a1 + swirl * 0.45, midR);
+  const d = [
+    `M ${f(x1)} ${f(y1)}`,
+    `A ${R} ${R} 0 0 1 ${f(x2)} ${f(y2)}`,
+    `Q ${f(c2x)} ${f(c2y)} ${f(ix2)} ${f(iy2)}`,
+    `A ${r0} ${r0} 0 0 0 ${f(ix1)} ${f(iy1)}`,
+    `Q ${f(c1x)} ${f(c1y)} ${f(x1)} ${f(y1)}`,
+    'Z',
+  ].join(' ');
+  return { d, px: f(x1), py: f(y1) };
+});
 ---
-<svg class={className} viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" aria-hidden="true">
-  <circle cx="50" cy="50" r="44" stroke-width="9" />
-  {[0, 60, 120, 180, 240, 300].map((deg) => (
-    <line x1="50" y1="12" x2="69" y2="45" transform={`rotate(${deg} 50 50)`} />
+<svg class={className} viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+  {blades.map((b) => (
+    <path class="blade" d={b.d} style={`transform-origin: ${b.px}px ${b.py}px`} />
   ))}
 </svg>

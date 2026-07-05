@@ -69,7 +69,19 @@ const { hero } = Astro.props as { hero: SiteContent['hero'] };
     color: var(--teal);
     vertical-align: baseline;
     margin-inline: 0.02em;
-    animation: iris-in 1.4s ease both;
+  }
+  /* shutter opening: blades sweep from closed to open around their rim pivots */
+  .hero-title :global(.hero-aperture .blade) {
+    transform-box: view-box;
+    animation: blade-open 1.4s cubic-bezier(0.7, 0, 0.25, 1) 0.25s both;
+  }
+  @keyframes blade-open {
+    from {
+      rotate: 24deg;
+    }
+    to {
+      rotate: 0deg;
+    }
   }
   .hero-sub-line {
     display: block;
@@ -115,22 +127,12 @@ const { hero } = Astro.props as { hero: SiteContent['hero'] };
     border-radius: 2px;
     animation: cue 1.8s ease-in-out infinite;
   }
-  @keyframes iris-in {
-    from {
-      rotate: -120deg;
-      opacity: 0;
-    }
-    to {
-      rotate: 0deg;
-      opacity: 1;
-    }
-  }
   @keyframes cue {
     0%, 100% { translate: 0 0; opacity: 1; }
     50% { translate: 0 0.5rem; opacity: 0.3; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hero-title :global(.hero-aperture),
+    .hero-title :global(.hero-aperture .blade),
     .hero-cue span {
       animation: none;
     }
