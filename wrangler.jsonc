@@ -30,7 +30,7 @@
 		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com",
 		// Cloudflare Access config for /admin — empty AUD means admin is locked (fail closed)
 		"ACCESS_TEAM_DOMAIN": "https://ancient-water-ea57.cloudflareaccess.com",
-		"ACCESS_AUD": ""
+		"ACCESS_AUD": "542fc32bcc774bc0da68f76185a86fb3724ff50390300e77f24e580b4ffc2823"
 	},
 	"assets": {
 		"directory": "./dist",
