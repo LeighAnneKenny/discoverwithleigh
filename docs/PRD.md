@@ -67,5 +67,6 @@ Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid
 ## Pending external tasks
 
 - GH repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (before first CI deploy).
-- Turnstile: create the real widget (dashboard, or API token with `Account.Turnstile:Edit`); set `TURNSTILE_SECRET` worker secret + `PUBLIC_TURNSTILE_SITEKEY` build var. Test always-pass keys in use until then.
-- Email Sending: onboard `discoverwithleigh.co.za` (`wrangler email sending enable`, needs suitable token or dashboard) and verify Leigh's inbox as a destination address (she clicks one confirmation email).
+- ~~Turnstile~~ Done 2026-07-05: real widget live, secret on Worker, enforcement verified.
+- Email Sending: onboard `discoverwithleigh.co.za` — dashboard (Email Service → Email Sending → Onboard Domain) or add the zone-level Email permission to the API token. Destination address `discoverwithleigh@gmail.com` registered 2026-07-05; awaiting verification click.
+- Preview URL: https://discoverwithleigh.admin-discoverwithleigh.workers.dev (live domain untouched until cutover).
