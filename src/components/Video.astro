@@ -1,6 +1,8 @@
 ---
 import Eyebrow from './Eyebrow.astro';
-import { video } from '../data/site';
+import type { SiteContent } from '../lib/content';
+
+const { video } = Astro.props as { video: SiteContent['video'] };
 ---
 <section class="section" id="video">
   <div class="wrap video-grid">

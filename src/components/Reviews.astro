@@ -1,6 +1,8 @@
 ---
 import Eyebrow from './Eyebrow.astro';
-import { reviews } from '../data/site';
+import type { SiteContent } from '../lib/content';
+
+const { reviews } = Astro.props as { reviews: SiteContent['reviews'] };
 ---
 <section class="section" id="reviews">
   <div class="wrap">

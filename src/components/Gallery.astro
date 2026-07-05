@@ -1,15 +1,8 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
-import { photography } from '../data/site';
-import items from '../data/gallery.json';
+import type { SiteContent, MediaItem } from '../lib/content';
 
-const images = import.meta.glob<{ default: ImageMetadata }>('../assets/gallery/*', { eager: true });
-const slides = items.flatMap((item) => {
-  const mod = images[`../assets/gallery/${item.file}`];
-  return mod ? [{ img: mod.default, cats: item.categories }] : [];
-});
+const { photography, items } = Astro.props as { photography: SiteContent['photography']; items: MediaItem[] };
 ---
 <section class="section" id="photography">
   <div class="wrap">
@@ -29,10 +22,10 @@ const slides = items.flatMap((item) => {
 
   <div class="wrap-wide">
     <div class="sheet" id="gallery-sheet">
-      {slides.map(({ img, cats }, i) => (
-        <button class="shot" data-cats={cats.join(',')} data-index={i} aria-label={`View photo — ${cats.join(', ') || 'photography'}`}>
-          <Image src={img} alt="" widths={[420, 700]} sizes="(max-width: 700px) 46vw, 24vw" />
-          {cats[0] && <span class="shot-tag">{cats[0]}</span>}
+      {items.map(({ url, w, h, categories }) => (
+        <button class="shot" data-cats={categories.join(',')} aria-label={`View photo — ${categories.join(', ') || 'photography'}`}>
+          <img src={url} width={w} height={h} alt="" loading="lazy" decoding="async" />
+          {categories[0] && <span class="shot-tag">{categories[0]}</span>}
         </button>
       ))}
     </div>
@@ -127,11 +120,13 @@ const slides = items.flatMap((item) => {
     break-inside: avoid;
     overflow: hidden;
   }
-  .shot :global(img) {
+  .shot img {
     width: 100%;
+    height: auto;
+    display: block;
     transition: scale 0.5s ease, opacity 0.5s ease;
   }
-  .shot:hover :global(img) {
+  .shot:hover img {
     scale: 1.04;
     opacity: 0.85;
   }
@@ -185,7 +180,7 @@ const slides = items.flatMap((item) => {
     z-index: 1;
   }
   @media (prefers-reduced-motion: reduce) {
-    .shot :global(img) {
+    .shot img {
       transition: none;
     }
   }

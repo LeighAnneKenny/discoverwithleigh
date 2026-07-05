@@ -10,20 +10,24 @@ import Influencer from '../components/Influencer.astro';
 import Reviews from '../components/Reviews.astro';
 import Brands from '../components/Brands.astro';
 import Contact from '../components/Contact.astro';
-import { photography, video, marketing, influencer } from '../data/site';
+import { loadContent, loadGallery, loadBrands } from '../lib/content';
+
+export const prerender = false;
+
+const [c, gallery, brands] = await Promise.all([loadContent(), loadGallery(), loadBrands()]);
 ---
-<Layout>
-  <Hero />
-  <About />
-  <Gallery />
-  <CtaBand line={photography.cta.line} label={photography.cta.label} />
-  <Video />
-  <CtaBand line={video.cta.line} label={video.cta.label} />
-  <Marketing />
-  <CtaBand line={marketing.cta.line} label={marketing.cta.label} />
-  <Influencer />
-  <CtaBand line={influencer.cta.line} label={influencer.cta.label} />
-  <Reviews />
-  <Brands />
-  <Contact />
+<Layout title={c.meta.title} description={c.meta.description}>
+  <Hero hero={c.hero} />
+  <About about={c.about} services={c.services} />
+  <Gallery photography={c.photography} items={gallery} />
+  <CtaBand line={c.photography.cta.line} label={c.photography.cta.label} />
+  <Video video={c.video} />
+  <CtaBand line={c.video.cta.line} label={c.video.cta.label} />
+  <Marketing marketing={c.marketing} />
+  <CtaBand line={c.marketing.cta.line} label={c.marketing.cta.label} />
+  <Influencer influencer={c.influencer} />
+  <CtaBand line={c.influencer.cta.line} label={c.influencer.cta.label} />
+  <Reviews reviews={c.reviews} />
+  <Brands items={brands} />
+  <Contact contact={c.contact} />
 </Layout>

@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import portrait from '../assets/about-leigh.jpg';
-import { about, services } from '../data/site';
+import type { SiteContent } from '../lib/content';
+
+const { about, services } = Astro.props as { about: SiteContent['about']; services: SiteContent['services'] };
 ---
 <section class="section" id="about">
   <div class="wrap about-grid">

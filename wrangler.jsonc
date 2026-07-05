@@ -13,9 +13,18 @@
 		}
 	],
 	"send_email": [{ "name": "EMAIL" }],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "dwl-media"
+		}
+	],
 	"vars": {
 		// ponytail: placeholder recipient — swap when Leigh confirms her preferred inbox
-		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com"
+		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com",
+		// Cloudflare Access config for /admin — empty means admin is locked (fail closed)
+		"ACCESS_TEAM_DOMAIN": "",
+		"ACCESS_AUD": ""
 	},
 	"assets": {
 		"directory": "./dist",

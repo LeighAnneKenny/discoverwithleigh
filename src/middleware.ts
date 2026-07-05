@@ -1,0 +1,31 @@
+import { defineMiddleware } from 'astro:middleware';
+import { env } from 'cloudflare:workers';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+
+// Defense in depth behind Cloudflare Access: every /admin* and /api/admin*
+// request must carry a valid Access JWT, regardless of hostname. Fail closed —
+// missing config or token means 403, including all workers.dev traffic.
+let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  if (!/^\/(admin|api\/admin)(\/|$)/.test(context.url.pathname)) return next();
+
+  // Local development only: bypass requires the gitignored .dev.vars flag AND a
+  // loopback host — deployed traffic can never present a localhost Host header.
+  const host = context.url.hostname;
+  if (env.ADMIN_DEV_BYPASS === 'allow-local-dev' && (host === '127.0.0.1' || host === 'localhost')) {
+    return next();
+  }
+
+  const token = context.request.headers.get('Cf-Access-Jwt-Assertion');
+  const team = env.ACCESS_TEAM_DOMAIN;
+  if (!token || !team || !env.ACCESS_AUD) return new Response('Forbidden', { status: 403 });
+
+  try {
+    jwks ??= createRemoteJWKSet(new URL(`${team}/cdn-cgi/access/certs`));
+    await jwtVerify(token, jwks, { issuer: team, audience: env.ACCESS_AUD });
+  } catch {
+    return new Response('Forbidden', { status: 403 });
+  }
+  return next();
+});

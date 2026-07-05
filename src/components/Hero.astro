@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import Aperture from './Aperture.astro';
 import heroBg from '../assets/hero-bg.jpg';
-import { hero } from '../data/site';
+import type { SiteContent } from '../lib/content';
+
+const { hero } = Astro.props as { hero: SiteContent['hero'] };
 ---
 <section class="hero">
   <Image

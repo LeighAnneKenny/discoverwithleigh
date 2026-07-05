@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
 import bg from '../assets/bg-influencer.jpg';
-import { influencer } from '../data/site';
+import type { SiteContent } from '../lib/content';
+
+const { influencer } = Astro.props as { influencer: SiteContent['influencer'] };
 ---
 <section class="section" id="influencer">
   <div class="wrap influencer-grid">

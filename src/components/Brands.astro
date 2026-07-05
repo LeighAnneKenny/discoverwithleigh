@@ -1,11 +1,8 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
+import type { MediaItem } from '../lib/content';
 
-const logos = Object.values(
-  import.meta.glob<{ default: ImageMetadata }>('../assets/brands/*', { eager: true }),
-).map((m) => m.default);
+const { items } = Astro.props as { items: MediaItem[] };
 ---
 <section class="section" id="brands">
   <div class="wrap reveal">
@@ -13,9 +10,9 @@ const logos = Object.values(
     <h2 class="section-heading">Brands I’ve worked with</h2>
   </div>
   <div class="brand-strip reveal" aria-label="Client brand logos">
-    {logos.map((logo) => (
+    {items.map((logo) => (
       <div class="brand-tile">
-        <Image src={logo} alt="" width={220} />
+        <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
       </div>
     ))}
   </div>
@@ -36,13 +33,14 @@ const logos = Object.values(
     aspect-ratio: 1;
     padding: 1.4rem;
   }
-  .brand-tile :global(img) {
+  .brand-tile img {
     max-width: 100%;
+    height: auto;
     filter: grayscale(1) brightness(1.6);
     opacity: 0.75;
     transition: filter 0.3s, opacity 0.3s;
   }
-  .brand-tile:hover :global(img) {
+  .brand-tile:hover img {
     filter: none;
     opacity: 1;
   }

@@ -17,6 +17,7 @@
     "@fontsource-variable/montserrat": "^5.2.8",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "astro": "^7.0.6",
+    "jose": "^6.2.3",
     "wrangler": "^4.107.0"
   }
 }
