@@ -12,16 +12,17 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
       <p class="lede">{photography.body}</p>
     </div>
 
-    <div class="filters reveal" role="group" aria-label="Filter gallery by category">
-      <button class="filter is-active" data-filter="all" aria-pressed="true">All</button>
+    <div class="tabs reveal" role="group" aria-label="Filter gallery by category">
+      <button class="tab is-active" data-filter="all" aria-pressed="true">All</button>
       {photography.categories.map((c) => (
-        <button class="filter" data-filter={c.toLowerCase()} aria-pressed="false">{c}</button>
+        <button class="tab" data-filter={c.toLowerCase()} aria-pressed="false">{c}</button>
       ))}
     </div>
   </div>
 
-  <div class="wrap-wide">
-    <div class="sheet" id="gallery-sheet">
+  <div class="carousel reveal">
+    <button class="arrow arrow-prev" id="gallery-prev" aria-label="Previous photos">&#8592;</button>
+    <div class="track" id="gallery-track" tabindex="0" role="region" aria-label="Photography gallery — scrolls horizontally">
       {items.map(({ url, w, h, categories }) => (
         <button class="shot" data-cats={categories.join(',')} aria-label={`View photo — ${categories.join(', ') || 'photography'}`}>
           <img src={url} width={w} height={h} alt="" loading="lazy" decoding="async" />
@@ -29,6 +30,7 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
         </button>
       ))}
     </div>
+    <button class="arrow arrow-next" id="gallery-next" aria-label="Next photos">&#8594;</button>
   </div>
 
   <dialog class="lightbox" id="lightbox">
@@ -38,13 +40,14 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
 </section>
 
 <script>
-  const sheet = document.getElementById('gallery-sheet')!;
-  const shots = [...sheet.querySelectorAll<HTMLElement>('.shot')];
-  const filters = document.querySelectorAll<HTMLButtonElement>('.filter');
+  const track = document.getElementById('gallery-track')!;
+  const shots = [...track.querySelectorAll<HTMLElement>('.shot')];
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.tab');
+  const smooth = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
-  filters.forEach((btn) =>
+  tabs.forEach((btn) =>
     btn.addEventListener('click', () => {
-      filters.forEach((b) => {
+      tabs.forEach((b) => {
         b.classList.toggle('is-active', b === btn);
         b.setAttribute('aria-pressed', String(b === btn));
       });
@@ -52,8 +55,13 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
       shots.forEach((s) => {
         s.hidden = f !== 'all' && !s.dataset.cats!.split(',').includes(f);
       });
+      track.scrollTo({ left: 0 });
     }),
   );
+
+  const page = (dir: number) => track.scrollBy({ left: dir * track.clientWidth * 0.8, behavior: smooth });
+  document.getElementById('gallery-prev')!.addEventListener('click', () => page(-1));
+  document.getElementById('gallery-next')!.addEventListener('click', () => page(1));
 
   const box = document.getElementById('lightbox') as HTMLDialogElement;
   const boxImg = document.getElementById('lightbox-img') as HTMLImageElement;
@@ -70,18 +78,17 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
 </script>
 
 <style>
-  .wrap-wide {
-    max-width: 100rem;
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-  }
-  .filters {
+  .tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    border-bottom: 1px solid var(--line);
     margin-block: 2.2rem 2.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
-  .filter {
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
     font-family: var(--font-label);
     font-size: 0.72rem;
     font-weight: 600;
@@ -89,43 +96,54 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
     text-transform: uppercase;
     color: var(--mist);
     background: none;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 0.55rem 1.2rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 0.7rem 1rem;
+    margin-bottom: -1px;
+    white-space: nowrap;
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s;
   }
-  .filter:hover {
+  .tab:hover {
     color: var(--paper);
-    border-color: var(--mist);
   }
-  .filter.is-active {
-    color: var(--ink);
-    background: var(--teal);
-    border-color: var(--teal);
+  .tab.is-active {
+    color: var(--teal-hi);
+    border-bottom-color: var(--teal);
   }
-  .sheet {
-    columns: 4 16rem;
+
+  .carousel {
+    position: relative;
+  }
+  .track {
+    display: flex;
     gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .track::-webkit-scrollbar {
+    display: none;
   }
   .shot[hidden] {
     display: none;
   }
   .shot {
     position: relative;
-    display: block;
-    width: 100%;
-    margin-bottom: 0.75rem;
+    flex: 0 0 auto;
+    height: clamp(17rem, 52vh, 26rem);
+    scroll-snap-align: start;
     padding: 0;
     border: 0;
     background: var(--ink-2);
     cursor: zoom-in;
-    break-inside: avoid;
     overflow: hidden;
   }
   .shot img {
-    width: 100%;
-    height: auto;
+    height: 100%;
+    width: auto;
     display: block;
     transition: scale 0.5s ease, opacity 0.5s ease;
   }
@@ -154,6 +172,40 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
   .shot:focus-visible .shot-tag {
     opacity: 1;
   }
+  .arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--paper);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .arrow:hover {
+    color: var(--teal-hi);
+    border-color: var(--mist);
+  }
+  .arrow-prev {
+    left: 0.9rem;
+  }
+  .arrow-next {
+    right: 0.9rem;
+  }
+  @media (min-width: 761px) {
+    .arrow {
+      display: grid;
+      place-items: center;
+    }
+  }
+
   .lightbox {
     border: 0;
     padding: 0;

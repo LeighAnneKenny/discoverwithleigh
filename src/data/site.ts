@@ -61,7 +61,19 @@ export const video = {
     'Creating stunning content for brands and agencies, and making high quality content accessible is my absolute passion. With over a decade of experience, we specialise in crafting beautiful video and still content that brings your brand to life.',
     'Since 2013, we’ve been perfecting the art of capturing everything our clients envision. Services include photography, videography, and copywriting. Whether you’re a large agency or a small business, we create content that truly represents your brand, making it shine in a competitive market.',
   ],
-  tiktokIds: ['7222594449979804933', '7293572260181429509'],
+  // Rotation pool — newest 8 from the live profile (2026-07-06) + the 2 originals. Admin-curatable.
+  tiktokIds: [
+    '7635668370729225480',
+    '7576347445815250183',
+    '7575159926318697735',
+    '7575150245516987655',
+    '7547753654191705362',
+    '7547722210073513234',
+    '7542918804146507016',
+    '7542797447093931282',
+    '7293572260181429509',
+    '7222594449979804933',
+  ],
   cta: { line: 'Ready to create some amazing video content?', label: 'Get started here' },
 };
 
@@ -137,4 +149,5 @@ export const contact = {
   email: 'discoverwithleigh@gmail.com',
   studio: 'Century City, Cape Town, South Africa',
   whatsapp: 'http://wa.link/s5hdey',
+  whatsappMessage: 'Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.',
 };

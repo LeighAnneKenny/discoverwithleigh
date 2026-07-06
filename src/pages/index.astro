@@ -10,6 +10,7 @@ import Influencer from '../components/Influencer.astro';
 import Reviews from '../components/Reviews.astro';
 import Brands from '../components/Brands.astro';
 import Contact from '../components/Contact.astro';
+import WhatsAppFab from '../components/WhatsAppFab.astro';
 import { loadContent, loadGallery, loadBrands } from '../lib/content';
 
 export const prerender = false;
@@ -51,4 +52,5 @@ const jsonLd = {
   <Reviews reviews={c.reviews} />
   <Brands items={brands} />
   <Contact contact={c.contact} />
+  <WhatsAppFab contact={c.contact} />
 </Layout>

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
+import { loadContent } from '../../../lib/content';
 
 export const prerender = false;
 
@@ -8,10 +9,8 @@ const KEYS = new Set([
   'video', 'marketing', 'influencer', 'reviews', 'contact',
 ]);
 
-export const GET: APIRoute = async () => {
-  const { results } = await env.DB.prepare('SELECT key, value FROM content').all<{ key: string; value: string }>();
-  return Response.json(Object.fromEntries(results.map((r) => [r.key, JSON.parse(r.value)])));
-};
+// Merged over site.ts defaults so newly added default fields show up in the form.
+export const GET: APIRoute = async () => Response.json(await loadContent());
 
 export const PUT: APIRoute = async ({ request }) => {
   const { key, value } = (await request.json()) as { key: string; value: unknown };

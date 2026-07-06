@@ -18,8 +18,14 @@ export type SiteContent = typeof shape;
 
 export async function loadContent(): Promise<SiteContent> {
   const { results } = await env.DB.prepare('SELECT key, value FROM content').all<{ key: string; value: string }>();
-  const rows = Object.fromEntries(results.map((r) => [r.key, JSON.parse(r.value)]));
-  return { ...shape, ...rows };
+  const merged: Record<string, unknown> = { ...shape };
+  for (const { key, value } of results) {
+    const base = merged[key];
+    const row = JSON.parse(value);
+    // one-level merge so fields added to site.ts defaults survive D1 rows that predate them
+    merged[key] = base && typeof base === 'object' && !Array.isArray(base) && !Array.isArray(row) ? { ...base, ...row } : row;
+  }
+  return merged as SiteContent;
 }
 
 export interface MediaItem {

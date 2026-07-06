@@ -3,6 +3,11 @@ import Eyebrow from './Eyebrow.astro';
 import type { SiteContent } from '../lib/content';
 
 const { video } = Astro.props as { video: SiteContent['video'] };
+
+// tiktokIds is a pool; rotate it server-side so each page load starts on a random
+// video, then the visitor swipes through the rest (page is rendered per request).
+const start = Math.floor(Math.random() * video.tiktokIds.length);
+const slides = [...video.tiktokIds.slice(start), ...video.tiktokIds.slice(0, start)];
 ---
 <section class="section" id="video">
   <div class="wrap video-grid">
@@ -11,27 +16,31 @@ const { video } = Astro.props as { video: SiteContent['video'] };
       <h2 class="section-heading">{video.heading}</h2>
       {video.body.map((p) => <p class="lede">{p}</p>)}
     </div>
-    <div class="tiktoks reveal" id="tiktoks">
-      {video.tiktokIds.map((id) => (
-        <blockquote
-          class="tiktok-embed"
-          cite={`https://www.tiktok.com/@discover_with_leigh/video/${id}`}
-          data-video-id={id}
-        >
-          <section>
-            <a href={`https://www.tiktok.com/@discover_with_leigh/video/${id}`} target="_blank" rel="noopener">
-              Watch on TikTok — @discover_with_leigh
-            </a>
-          </section>
-        </blockquote>
-      ))}
+    <div class="tiktok-carousel reveal">
+      <button class="tk-arrow tk-prev" id="tiktok-prev" aria-label="Previous video">&#8592;</button>
+      <div class="tk-track" id="tiktoks" tabindex="0" role="region" aria-label="TikTok videos — scrolls horizontally">
+        {slides.map((id) => (
+          <blockquote
+            class="tiktok-embed"
+            cite={`https://www.tiktok.com/@discover_with_leigh/video/${id}`}
+            data-video-id={id}
+          >
+            <section>
+              <a href={`https://www.tiktok.com/@discover_with_leigh/video/${id}`} target="_blank" rel="noopener">
+                Watch on TikTok — @discover_with_leigh
+              </a>
+            </section>
+          </blockquote>
+        ))}
+      </div>
+      <button class="tk-arrow tk-next" id="tiktok-next" aria-label="Next video">&#8594;</button>
     </div>
   </div>
 </section>
 
 <script>
   // Load TikTok's embed script only when the section approaches the viewport.
-  const target = document.getElementById('tiktoks')!;
+  const track = document.getElementById('tiktoks')!;
   const io = new IntersectionObserver(
     (entries) => {
       if (entries.some((e) => e.isIntersecting)) {
@@ -44,7 +53,12 @@ const { video } = Astro.props as { video: SiteContent['video'] };
     },
     { rootMargin: '400px' },
   );
-  io.observe(target);
+  io.observe(track);
+
+  const smooth = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  const page = (dir: number) => track.scrollBy({ left: dir * track.clientWidth, behavior: smooth });
+  document.getElementById('tiktok-prev')!.addEventListener('click', () => page(-1));
+  document.getElementById('tiktok-next')!.addEventListener('click', () => page(1));
 </script>
 
 <style>
@@ -54,25 +68,66 @@ const { video } = Astro.props as { video: SiteContent['video'] };
     gap: clamp(2rem, 6vw, 5rem);
     align-items: center;
   }
-  .tiktoks {
+  .tiktok-carousel {
+    position: relative;
+    width: min(325px, 100%);
+    margin-inline: auto;
+  }
+  .tk-track {
     display: flex;
     gap: 1rem;
-    justify-content: center;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
   }
-  .tiktoks :global(.tiktok-embed) {
+  .tk-track::-webkit-scrollbar {
+    display: none;
+  }
+  .tk-track :global(.tiktok-embed) {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
     margin: 0;
     max-width: 325px;
     min-width: 0;
-    flex: 1 1 0;
     min-height: 575px;
     background: var(--ink-2);
+  }
+  .tk-arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--paper);
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tk-arrow:hover {
+    color: var(--teal-hi);
+    border-color: var(--mist);
+  }
+  .tk-prev {
+    left: -1.25rem;
+  }
+  .tk-next {
+    right: -1.25rem;
+  }
+  @media (min-width: 761px) {
+    .tk-arrow {
+      display: grid;
+      place-items: center;
+    }
   }
   @media (max-width: 900px) {
     .video-grid {
       grid-template-columns: 1fr;
-    }
-    .tiktoks {
-      flex-wrap: wrap;
     }
   }
 </style>
