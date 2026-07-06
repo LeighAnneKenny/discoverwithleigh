@@ -121,7 +121,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAAD
   }
   .form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* minmax(0,…) so tracks can shrink below the controls' intrinsic width */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1.1rem;
   }
   label {
@@ -136,6 +137,8 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAAD
   }
   input,
   textarea {
+    width: 100%;
+    min-width: 0; /* defeat the UA's size="20" intrinsic minimum (Bug fixes #1) */
     font: 1rem var(--font-body);
     color: var(--paper);
     background: var(--ink-2);
