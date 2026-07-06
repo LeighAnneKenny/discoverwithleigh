@@ -70,16 +70,25 @@ const { hero } = Astro.props as { hero: SiteContent['hero'] };
     vertical-align: baseline;
     margin-inline: 0.02em;
   }
-  /* shutter opening: blades sweep from closed to open around their rim pivots */
+  /* shutter click on load: open → snap closed (the capture) → reopen */
   .hero-title :global(.hero-aperture .blade) {
     transform-box: view-box;
-    animation: blade-open 1.4s cubic-bezier(0.7, 0, 0.25, 1) 0.25s both;
+    animation: blade-click 1.7s 0.5s both;
   }
-  @keyframes blade-open {
-    from {
-      rotate: 24deg;
+  @keyframes blade-click {
+    0% {
+      rotate: 0deg;
+      animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
     }
-    to {
+    38% {
+      rotate: 24deg;
+      animation-timing-function: linear;
+    }
+    50% {
+      rotate: 24deg;
+      animation-timing-function: cubic-bezier(0.2, 0.6, 0.3, 1);
+    }
+    100% {
       rotate: 0deg;
     }
   }

@@ -48,9 +48,13 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 | 8 | Developer deploys | Push to main → live in < 5 min; rollback = `git revert` |
 | 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept |
 
-## Brand mark fidelity (feedback, 2026-07-05; expanded 2026-07-06)
+## Brand mark fidelity — ✅ SIGNED OFF 2026-07-06
 
-The current header/hero uses a hand-drawn approximation of the logo's aperture device. Requirement: capture the existing logo as faithfully as possible — preferably by tracing the original (`src/assets/logo.png` / the aperture favicon) into a true SVG — so the mark is identical to the brand asset and can be animated on initial page load. The animation must read as a **camera shutter/iris closing-and-opening** (blades sweeping in toward centre, then apart) — the current rotate-in reads as a *wheel turning*, which is the wrong metaphor for a photography brand. Fallback: a cleaned-up raster with a CSS-animated reveal.
+Resolved in design session with Caveshen:
+- **Header**: Leigh's original lockup (Celtic knot + aperture centre + wordmark with underlined O + tagline) used 1:1 as a trimmed transparent image (`src/assets/logo-lockup.png`), build-optimised.
+- **Footer**: same lockup left-aligned as a signature; legal lines (privacy / copyright / email) stacked right.
+- **Hero**: parametric SVG aperture (`Aperture.astro` — blade count, radii, swirl, gap all tunable) as the O in DISCOVER. Approved at **6 blades** (deliberate deviation from the logo's 7). On load it performs a **shutter click**: open → snap closed → reopen, ~2.2s, reduced-motion renders static.
+- Light mode will need the dark logo variant (see Next run item 5).
 
 ## Admin v2 (feedback, 2026-07-06)
 

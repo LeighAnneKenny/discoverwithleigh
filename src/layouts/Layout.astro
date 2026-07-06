@@ -2,8 +2,9 @@
 import '@fontsource-variable/montserrat';
 import '@fontsource-variable/nunito-sans';
 import '../styles/global.css';
-import Aperture from '../components/Aperture.astro';
-import { meta, nav, socials, contact } from '../data/site';
+import { Image } from 'astro:assets';
+import logoLockup from '../assets/logo-lockup.png';
+import { meta, nav, contact } from '../data/site';
 
 interface Props {
   title?: string;
@@ -30,8 +31,7 @@ const { title = meta.title, description = meta.description } = Astro.props;
     <header class="site-header" id="site-header">
       <div class="wrap header-inner">
         <a class="brand" href="/#top" aria-label="Discover With Leigh — home">
-          <Aperture class="brand-mark" />
-          <span>Discover <em>with</em> Leigh</span>
+          <Image src={logoLockup} alt="Discover With Leigh — marketing content creation" widths={[240, 480]} sizes="10rem" class="brand-lockup" />
         </a>
         <nav class="site-nav" id="site-nav" aria-label="Main">
           <ul>
@@ -52,16 +52,12 @@ const { title = meta.title, description = meta.description } = Astro.props;
 
     <footer class="site-footer">
       <div class="wrap footer-inner">
-        <ul class="footer-socials" aria-label="Social media">
-          {socials.map((s) => (
-            <li><a href={s.url} target="_blank" rel="noopener">{s.name}</a></li>
-          ))}
-        </ul>
-        <p>
-          &copy; {new Date().getFullYear()} Discover With Leigh &middot;
-          <a href="/privacy-policy">Privacy Policy</a> &middot;
-          <a href={`mailto:${contact.email}`}>{contact.email}</a>
-        </p>
+        <Image src={logoLockup} alt="Discover With Leigh" widths={[360, 720]} sizes="14rem" class="signature-lockup" loading="lazy" />
+        <div class="footer-legal">
+          <p><a href="/privacy-policy">Privacy Policy</a></p>
+          <p>&copy; {new Date().getFullYear()} Discover With Leigh. All rights reserved.</p>
+          <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+        </div>
       </div>
     </footer>
 
@@ -120,21 +116,10 @@ const { title = meta.title, description = meta.description } = Astro.props;
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 0.65rem;
-        font-family: var(--font-display);
-        font-size: 1rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--paper);
       }
-      .brand em {
-        font-style: normal;
-        color: var(--teal);
-      }
-      .brand :global(.brand-mark) {
-        width: 1.5rem;
-        height: 1.5rem;
-        color: var(--teal);
+      .brand :global(.brand-lockup) {
+        height: 3rem;
+        width: auto;
       }
       .site-nav ul {
         display: flex;
@@ -202,41 +187,42 @@ const { title = meta.title, description = meta.description } = Astro.props;
 
       .site-footer {
         border-top: 1px solid var(--line);
-        padding-block: 2.5rem;
+        padding-block: 3rem;
       }
       .footer-inner {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.5rem;
+        gap: 2rem;
         align-items: center;
         justify-content: space-between;
+      }
+      .footer-inner :global(.signature-lockup) {
+        width: clamp(11rem, 22vw, 14rem);
+        height: auto;
+        opacity: 0.9;
+      }
+      .footer-legal {
+        text-align: right;
         font-size: 0.85rem;
         color: var(--mist);
+        display: grid;
+        gap: 0.35rem;
       }
-      .footer-socials {
-        display: flex;
-        gap: 1.4rem;
-        list-style: none;
-      }
-      .footer-socials a {
-        font-family: var(--font-label);
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--mist);
-        transition: color 0.2s;
-      }
-      .footer-socials a:hover {
-        color: var(--teal-hi);
-      }
-      .site-footer p a {
+      .footer-legal a {
         color: var(--mist);
         text-decoration: underline;
         text-underline-offset: 3px;
       }
-      .site-footer p a:hover {
+      .footer-legal a:hover {
         color: var(--teal-hi);
+      }
+      @media (max-width: 700px) {
+        .footer-inner {
+          justify-content: center;
+        }
+        .footer-legal {
+          text-align: center;
+        }
       }
     </style>
   </body>
