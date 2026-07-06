@@ -48,7 +48,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAAD
         class="cf-turnstile"
         data-sitekey={turnstileSiteKey}
         data-action="turnstile-spin-v1"
-        data-theme="dark"
+        data-theme="auto"
       ></div>
       <button class="btn" type="submit">Send message</button>
     </form>
@@ -161,6 +161,10 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAAD
   .form-error {
     border-color: #c4544d;
     color: #e08a84;
+  }
+  :global([data-theme='light']) .form-error {
+    border-color: #a63a32;
+    color: #8f2f28;
   }
   .contact-form .btn {
     justify-self: start;

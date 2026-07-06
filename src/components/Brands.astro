@@ -44,4 +44,8 @@ const { items } = Astro.props as { items: MediaItem[] };
     filter: none;
     opacity: 1;
   }
+  /* the brightness lift is for dark tiles; on light tiles darken instead */
+  :global([data-theme='light']) .brand-tile img {
+    filter: grayscale(1) brightness(0.85);
+  }
 </style>

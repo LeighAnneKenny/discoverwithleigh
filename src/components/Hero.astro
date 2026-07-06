@@ -36,6 +36,13 @@ const { hero } = Astro.props as { hero: SiteContent['hero'] };
     display: grid;
     place-items: center;
     overflow: hidden;
+    /* text sits over the darkened photo — pin dark-theme colours in both themes
+       (--ink is NOT pinned: the bottom gradient must fade into the page background) */
+    --paper: #f2f1ec;
+    --mist: #97a09c;
+    --teal: #00a79d;
+    --teal-hi: #2bd9cd;
+    color: var(--paper); /* re-anchor inherited text colour to the pinned value */
   }
   .hero :global(.hero-bg) {
     position: absolute;

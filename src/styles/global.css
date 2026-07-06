@@ -8,6 +8,7 @@
 }
 
 :root {
+  color-scheme: dark; /* declares native theming; also opts out of Chromium auto-dark rewrites */
   --ink: #0b0d0d;
   --ink-2: #131716;
   --line: #242b29;
@@ -23,6 +24,40 @@
   --measure: 62ch;
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --section-pad: clamp(5rem, 12vh, 8.5rem);
+}
+
+/* ---- light theme (toggle in header; default follows prefers-color-scheme) ----
+   Reference: the original WordPress site — off-white body, black header/footer/CTA
+   bands, teal accents. Light mode restores that; dark mode stays as designed. */
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ink: #faf9f6;
+  --ink-2: #f1f0ea;
+  --line: #e3e1d8;
+  --paper: #161a19;
+  --mist: #55605c;
+  --teal: #00877e;
+  --teal-hi: #00736b;
+}
+
+/* Brand anchors that stay dark in both themes (header, footer, CTA bands) —
+   the logo artwork is always white-on-dark, exactly as Leigh designed it. */
+.always-dark {
+  --ink: #0b0d0d;
+  --ink-2: #131716;
+  --line: #242b29;
+  --paper: #f2f1ec;
+  --mist: #97a09c;
+  --teal: #00a79d;
+  --teal-hi: #2bd9cd;
+  color: var(--paper);
+}
+
+/* Without a hero photo behind it, the fixed header needs its solid
+   background from the start (invisible in dark mode, black bar in light). */
+body:not(:has(.hero)) .site-header {
+  background: var(--ink);
 }
 
 * {

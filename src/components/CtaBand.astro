@@ -1,9 +1,19 @@
 ---
 const { line, label = 'Get started here' } = Astro.props;
 ---
-<div class="wrap">
-  <div class="cta-band reveal">
-    <p>{line}</p>
-    <a class="btn" href="#contact">{label}</a>
+<div class="cta-strip always-dark">
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <p>{line}</p>
+      <a class="btn" href="#contact">{label}</a>
+    </div>
   </div>
 </div>
+
+<style>
+  /* invisible in dark mode (matches the page); a full-bleed black band in light,
+     as on the original site */
+  .cta-strip {
+    background: var(--ink);
+  }
+</style>
