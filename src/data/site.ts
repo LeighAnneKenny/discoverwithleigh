@@ -12,7 +12,6 @@ export const socials = [
   { name: 'Instagram', url: 'https://www.instagram.com/discover_with_leigh/' },
   { name: 'Facebook', url: 'https://www.facebook.com/leighannekennyza' },
   { name: 'YouTube', url: 'https://www.youtube.com/channel/UCjyVZP6593CcIpepfOIKs1w' },
-  { name: 'WhatsApp', url: 'http://wa.link/s5hdey' },
 ] as const;
 
 export const nav = [
