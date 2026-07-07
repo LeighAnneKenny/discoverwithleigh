@@ -13,9 +13,11 @@ const { marketing } = Astro.props as { marketing: SiteContent['marketing'] };
     </div>
 
     <h3 class="process-title reveal">{marketing.processTitle}</h3>
-    <ol class="process">
+    <!-- reveal the grid as one block: per-tile transforms become composited
+         layers whose device-pixel snapping can overpaint the 1px dividers -->
+    <ol class="process reveal">
       {marketing.process.map((step, i) => (
-        <li class="reveal">
+        <li>
           <span class="step-no">{String(i + 1).padStart(2, '0')}</span>
           <h4>{step.name}</h4>
           <p>{step.text}</p>
