@@ -83,6 +83,8 @@ The v1 admin edits existing values only. Wanted next: add/remove items in list c
 
 7. ✅ *Shipped 2026-07-07 (with admin v2 list editing, as planned).* **Admin-customisable social links.** (Added 2026-07-06; pairs with Bug fixes #3.) Socials promoted to a `socials` content section (platform name + URL, per-link `show` flag), editable in admin under "Social links"; icons matched by platform name with a text fallback for unrecognised platforms; the homepage JSON-LD `sameAs` derives from the visible links.
 
+8. **Unit tests for the API surface.** (Added 2026-07-07 — retro-fit, deliberately.) Vitest + `@cloudflare/vitest-pool-workers` so tests run in workerd against real D1/R2 bindings. Priority order: middleware auth (fail-closed on missing config, bypass requires flag AND loopback host), `/api/contact` (honeypot, Turnstile fail-closed, required fields, enquiry stored even when email fails), `loadContent` one-level merge, admin media PATCH branching (order vs categories vs label vs enabled). Components stay untested — the visual QA rig covers them. Until this lands, every ship keeps its end-to-end curl verification.
+
 ## AI & search discoverability (feedback, 2026-07-06)
 
 The site should be findable and summarisable by search engines *and* LLM crawlers — the goal is appearing when someone asks an assistant for photographers / digital marketers in Cape Town. Welcome crawlers; block nothing that reads politely. What we prevent is abuse, not access: no full-site scraping abuse or DDoS (Cloudflare's free unmetered DDoS protection covers the latter; add a WAF rate-limiting rule at cutover).
