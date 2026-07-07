@@ -9,7 +9,10 @@ const { contact, socials: allSocials } = Astro.props as {
 const socials = allSocials.filter((s) => s.show);
 
 // Sitekeys are public identifiers; the secret lives only as a Worker secret.
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAADwIcHofRL-bGbeM';
+const turnstileSiteKey = '0x4AAAAAADwIcHofRL-bGbeM';
+
+// Same construction as the FAB: number from contact details, admin-editable message.
+const whatsappHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${encodeURIComponent(contact.whatsappMessage)}`;
 
 // Simple Icons glyph paths (24×24 viewBox), keyed by platform name.
 // Unrecognised platforms fall back to their text label in the template.
@@ -37,7 +40,7 @@ const socialIcons: Record<string, string> = {
         <dt>Studio</dt>
         <dd>{contact.studio}</dd>
       </dl>
-      <a class="btn" href={contact.whatsapp} target="_blank" rel="noopener">WhatsApp to set up a meeting</a>
+      <a class="btn" href={whatsappHref} target="_blank" rel="noopener">WhatsApp to set up a meeting</a>
       <ul class="contact-socials" aria-label="Social media">
         {socials.map((s) => (
           <li>

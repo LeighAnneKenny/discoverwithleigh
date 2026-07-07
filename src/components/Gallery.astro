@@ -23,7 +23,7 @@ const { photography, items } = Astro.props as { photography: SiteContent['photog
   <div class="carousel reveal">
     <button class="arrow arrow-prev" id="gallery-prev" aria-label="Previous photos">&#8592;</button>
     <div class="track" id="gallery-track" tabindex="0" role="region" aria-label="Photography gallery — scrolls horizontally">
-      {items.map(({ url, w, h, categories }) => (
+      {items.map(({ url, w, h, categories = [] }) => (
         <button class="shot" data-cats={categories.join(',')} aria-label={`View photo — ${categories.join(', ') || 'photography'}`}>
           <img src={url} width={w} height={h} alt="" loading="lazy" decoding="async" />
           {categories[0] && <span class="shot-tag">{categories[0]}</span>}

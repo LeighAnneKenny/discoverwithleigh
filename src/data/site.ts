@@ -147,6 +147,5 @@ export const contact = {
   phoneHref: 'tel:+27722277016',
   email: 'discoverwithleigh@gmail.com',
   studio: 'Century City, Cape Town, South Africa',
-  whatsapp: 'http://wa.link/s5hdey',
   whatsappMessage: 'Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.',
 };

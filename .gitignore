@@ -33,3 +33,4 @@ coverage
 .env
 .dev.vars
 worker-configuration.d.ts
+scripts/seed.sql

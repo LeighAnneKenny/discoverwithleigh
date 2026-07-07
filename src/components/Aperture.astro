@@ -1,43 +1,15 @@
 ---
-// Faithful trace of the brand aperture: teal disc, seven swirling blades,
-// open centre. Parametric so the geometry can be tuned against the original.
+// Faithful trace of the brand aperture: teal disc, six swirling blades, open
+// centre. Geometry frozen from the signed-off parameters (2026-07-06):
+// N=6 blades, R=48 disc, r0=17 opening, swirl=50°, gap=2° — regenerate with
+// the same maths if the mark is ever retuned.
 const { class: className } = Astro.props;
-
-const N = 6;        // blade count (logo has 7; trying 6 per design session 2026-07-06)
-const C = 50;       // centre
-const R = 48;       // disc radius
-const r0 = 17;      // centre opening radius
-const swirl = 50;   // degrees the seams sweep as they travel inward
-const gap = 2;      // half-gap between blades, degrees at the rim
-const step = 360 / N;
-
-const rad = (d: number) => (d * Math.PI) / 180;
-const pt = (deg: number, radius: number) => [C + radius * Math.cos(rad(deg)), C + radius * Math.sin(rad(deg))] as const;
-const f = (n: number) => n.toFixed(2);
-
-const blades = Array.from({ length: N }, (_, i) => {
-  const a1 = i * step + gap;
-  const a2 = (i + 1) * step - gap;
-  const [x1, y1] = pt(a1, R);
-  const [x2, y2] = pt(a2, R);
-  const [ix2, iy2] = pt(a2 + swirl, r0);
-  const [ix1, iy1] = pt(a1 + swirl, r0);
-  const midR = (R + r0) * 0.56;
-  const [c2x, c2y] = pt(a2 + swirl * 0.45, midR);
-  const [c1x, c1y] = pt(a1 + swirl * 0.45, midR);
-  const d = [
-    `M ${f(x1)} ${f(y1)}`,
-    `A ${R} ${R} 0 0 1 ${f(x2)} ${f(y2)}`,
-    `Q ${f(c2x)} ${f(c2y)} ${f(ix2)} ${f(iy2)}`,
-    `A ${r0} ${r0} 0 0 0 ${f(ix1)} ${f(iy1)}`,
-    `Q ${f(c1x)} ${f(c1y)} ${f(x1)} ${f(y1)}`,
-    'Z',
-  ].join(' ');
-  return { d, px: f(x1), py: f(y1) };
-});
 ---
 <svg class={className} viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
-  {blades.map((b) => (
-    <path class="blade" d={b.d} style={`transform-origin: ${b.px}px ${b.py}px`} />
-  ))}
+  <path class="blade" d="M 97.97 51.68 A 48 48 0 0 1 75.44 90.71 Q 56.01 85.90 44.75 66.17 A 17 17 0 0 0 60.47 63.40 Q 83.12 65.09 97.97 51.68 Z" style="transform-origin: 97.97px 51.68px" />
+  <path class="blade" d="M 72.53 92.38 A 48 48 0 0 1 27.47 92.38 Q 21.91 73.15 33.37 53.53 A 17 17 0 0 0 43.63 65.76 Q 53.49 86.23 72.53 92.38 Z" style="transform-origin: 72.53px 92.38px" />
+  <path class="blade" d="M 24.56 90.71 A 48 48 0 0 1 2.03 51.68 Q 15.91 37.25 38.62 37.37 A 17 17 0 0 0 33.17 52.37 Q 20.37 71.14 24.56 90.71 Z" style="transform-origin: 24.56px 90.71px" />
+  <path class="blade" d="M 2.03 48.32 A 48 48 0 0 1 24.56 9.29 Q 43.99 14.10 55.25 33.83 A 17 17 0 0 0 39.53 36.60 Q 16.88 34.91 2.03 48.32 Z" style="transform-origin: 2.03px 48.32px" />
+  <path class="blade" d="M 27.47 7.62 A 48 48 0 0 1 72.53 7.62 Q 78.09 26.85 66.63 46.47 A 17 17 0 0 0 56.37 34.24 Q 46.51 13.77 27.47 7.62 Z" style="transform-origin: 27.47px 7.62px" />
+  <path class="blade" d="M 75.44 9.29 A 48 48 0 0 1 97.97 48.32 Q 84.09 62.75 61.38 62.63 A 17 17 0 0 0 66.83 47.63 Q 79.63 28.86 75.44 9.29 Z" style="transform-origin: 75.44px 9.29px" />
 </svg>

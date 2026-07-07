@@ -16,6 +16,7 @@ const shape = {
   socials: defaults.socials,
 };
 export type SiteContent = typeof shape;
+export const contentKeys = new Set(Object.keys(shape));
 
 export async function loadContent(): Promise<SiteContent> {
   const { results } = await env.DB.prepare('SELECT key, value FROM content').all<{ key: string; value: string }>();
@@ -33,9 +34,9 @@ export interface MediaItem {
   url: string;
   w: number;
   h: number;
-  categories: string[];
+  categories?: string[]; // gallery only
   id: number;
-  label?: string;
+  label?: string; // brands only
 }
 
 export async function loadGallery(): Promise<MediaItem[]> {
@@ -57,5 +58,5 @@ export async function loadBrands(): Promise<MediaItem[]> {
     h: number;
     label: string;
   }>();
-  return results.map((r) => ({ id: r.id, url: `/media/${r.r2_key}`, w: r.w, h: r.h, categories: [], label: r.label }));
+  return results.map((r) => ({ id: r.id, url: `/media/${r.r2_key}`, w: r.w, h: r.h, label: r.label }));
 }
