@@ -74,6 +74,7 @@ export const prerender = false;
         meta: 'Site metadata', hero: 'Hero', about: 'About', services: 'Services list',
         photography: 'Photography', video: 'Video', marketing: 'Social media management',
         influencer: 'Influencer', reviews: 'Client reviews', contact: 'Contact details',
+        socials: 'Social links',
       };
       const content: Record<string, any> = await api('/api/admin/content');
 
@@ -82,6 +83,50 @@ export const prerender = false;
       }
       function set(obj: any, path: (string | number)[], v: any) {
         get(obj, path.slice(0, -1))[path.at(-1)!] = v;
+      }
+
+      // Blanked deep-clone of an existing item, used as the template for "+ Add".
+      function blank(v: any): any {
+        if (typeof v === 'string') return '';
+        if (typeof v === 'boolean') return true;
+        if (Array.isArray(v)) return [];
+        if (v && typeof v === 'object') return Object.fromEntries(Object.keys(v).map((k) => [k, blank(v[k])]));
+        return v;
+      }
+      // Item shape per list, captured before the list can be emptied.
+      const templates: Record<string, any> = {};
+
+      function chip(label: string, fn: () => void, cls = 'chip') {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = label;
+        b.className = cls;
+        b.addEventListener('click', fn);
+        return b;
+      }
+
+      // Editable list: every array gets move/remove per item and an Add button.
+      function renderList(root: string, arrPath: (string | number)[], into: HTMLElement) {
+        const arr: any[] = arrPath.length ? get(content[root], arrPath) : content[root];
+        const tplKey = [root, ...arrPath].join('.');
+        if (!(tplKey in templates) && arr.length) templates[tplKey] = blank(arr[0]);
+        const redraw = () => renderList(root, arrPath, into);
+        into.replaceChildren();
+        arr.forEach((item, i) => {
+          const row = document.createElement('div');
+          row.className = 'list-item';
+          row.appendChild(field(root, [...arrPath, i], item));
+          const ctl = document.createElement('div');
+          ctl.className = 'item-ctl';
+          ctl.append(
+            chip('↑', () => { if (i > 0) { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; redraw(); } }),
+            chip('↓', () => { if (i < arr.length - 1) { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; redraw(); } }),
+            chip('✕', () => { arr.splice(i, 1); redraw(); }, 'chip danger'),
+          );
+          row.appendChild(ctl);
+          into.appendChild(row);
+        });
+        into.appendChild(chip('+ Add', () => { arr.push(structuredClone(templates[tplKey] ?? '')); redraw(); }));
       }
 
       function field(root: string, path: (string | number)[], value: any): HTMLElement {
@@ -98,12 +143,23 @@ export const prerender = false;
           input.addEventListener('input', () => set(content[root], path, input.value));
           label.appendChild(input);
           wrap.appendChild(label);
+        } else if (typeof value === 'boolean') {
+          const label = document.createElement('label');
+          label.className = 'check';
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = value;
+          input.addEventListener('change', () => set(content[root], path, input.checked));
+          label.append(input, name);
+          wrap.appendChild(label);
         } else if (Array.isArray(value)) {
           const fs = document.createElement('fieldset');
           const lg = document.createElement('legend');
           lg.textContent = name;
           fs.appendChild(lg);
-          value.forEach((item, i) => fs.appendChild(field(root, [...path, i], item)));
+          const list = document.createElement('div');
+          renderList(root, path, list);
+          fs.appendChild(list);
           wrap.appendChild(fs);
         } else if (value && typeof value === 'object') {
           const fs = document.createElement('fieldset');
@@ -125,8 +181,13 @@ export const prerender = false;
         det.innerHTML = `<summary>${LABELS[key]}</summary>`;
         const body = document.createElement('div');
         const v = content[key];
-        if (Array.isArray(v)) v.forEach((item, i) => body.appendChild(field(key, [i], item)));
-        else for (const k of Object.keys(v)) body.appendChild(field(key, [k], v[k]));
+        if (Array.isArray(v)) {
+          const list = document.createElement('div');
+          renderList(key, [], list);
+          body.appendChild(list);
+        } else {
+          for (const k of Object.keys(v)) body.appendChild(field(key, [k], v[k]));
+        }
         const save = document.createElement('button');
         save.className = 'btn-save';
         save.textContent = 'Save';
@@ -188,6 +249,24 @@ export const prerender = false;
           card.appendChild(chipRow);
         }
 
+        if (t === 'brands') {
+          card.classList.toggle('off', !row.enabled);
+          const label = document.createElement('input');
+          label.className = 'brand-label';
+          label.placeholder = 'Label (optional)';
+          label.value = row.label ?? '';
+          label.addEventListener('change', async () => {
+            await api('/api/admin/media?table=brands', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: row.id, label: label.value }),
+            });
+            row.label = label.value;
+            flash('Label saved.');
+          });
+          card.appendChild(label);
+        }
+
         const actions = document.createElement('div');
         actions.className = 'actions';
         const move = async (delta: number) => {
@@ -202,6 +281,22 @@ export const prerender = false;
           });
           renderMedia(t, rows);
         };
+        if (t === 'brands') {
+          const vis = document.createElement('button');
+          vis.textContent = row.enabled ? 'Shown' : 'Hidden';
+          vis.className = row.enabled ? 'chip on' : 'chip';
+          vis.addEventListener('click', async () => {
+            row.enabled = row.enabled ? 0 : 1;
+            await api('/api/admin/media?table=brands', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: row.id, enabled: !!row.enabled }),
+            });
+            renderMedia(t, rows);
+            flash(row.enabled ? 'Tile shown on the site.' : 'Tile hidden from the site.');
+          });
+          actions.appendChild(vis);
+        }
         for (const [label, fn] of [
           ['←', () => move(-1)],
           ['→', () => move(1)],
@@ -390,6 +485,8 @@ export const prerender = false;
       }
       .grid-small { grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); }
       .card { border: 1px solid var(--line); padding: 0.5rem; margin: 0; }
+      .card.off img { opacity: 0.35; }
+      .brand-label { width: 100%; margin-top: 0.5rem; font-size: 0.85rem; padding: 0.4rem 0.6rem; }
       .card img { width: 100%; height: 9rem; object-fit: cover; display: block; }
       .grid-small .card img { height: 6rem; object-fit: contain; }
       .chips, .actions { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
@@ -408,6 +505,12 @@ export const prerender = false;
       }
       .chip.on { color: var(--ink); background: var(--teal); border-color: var(--teal); }
       .chip.danger { color: #e08a84; border-color: #c4544d; margin-left: auto; }
+      .list-item { display: flex; gap: 0.6rem; align-items: flex-start; }
+      .list-item > .field { flex: 1; min-width: 0; }
+      .item-ctl { display: flex; flex-direction: column; gap: 0.3rem; padding-top: 0.9rem; }
+      .item-ctl .chip.danger { margin-left: 0; }
+      .field label.check { display: flex; align-items: center; gap: 0.5rem; }
+      .field label.check input { accent-color: var(--teal); width: 1rem; height: 1rem; }
       table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
       th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
       th {

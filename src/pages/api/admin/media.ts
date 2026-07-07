@@ -10,7 +10,9 @@ const table = (url: URL) => TABLES[url.searchParams.get('table') as keyof typeof
 export const GET: APIRoute = async ({ url }) => {
   const t = table(url);
   if (!t) return new Response('Bad request', { status: 400 });
-  const { results } = await env.DB.prepare(`SELECT id, r2_key, ${t === 'gallery' ? 'categories,' : ''} sort, w, h FROM ${t} ORDER BY sort`).all();
+  const { results } = await env.DB.prepare(
+    `SELECT id, r2_key, ${t === 'gallery' ? 'categories,' : 'label, enabled,'} sort, w, h FROM ${t} ORDER BY sort`,
+  ).all();
   return Response.json(results);
 };
 
@@ -44,13 +46,23 @@ export const POST: APIRoute = async ({ url, request }) => {
 export const PATCH: APIRoute = async ({ url, request }) => {
   const t = table(url);
   if (!t) return new Response('Bad request', { status: 400 });
-  const body = (await request.json()) as { order?: number[]; id?: number; categories?: string[] };
+  const body = (await request.json()) as {
+    order?: number[];
+    id?: number;
+    categories?: string[];
+    label?: string;
+    enabled?: boolean;
+  };
 
   if (body.order) {
     const stmts = body.order.map((id, i) => env.DB.prepare(`UPDATE ${t} SET sort = ? WHERE id = ?`).bind(i, id));
     await env.DB.batch(stmts);
   } else if (t === 'gallery' && body.id && Array.isArray(body.categories)) {
     await env.DB.prepare('UPDATE gallery SET categories = ? WHERE id = ?').bind(JSON.stringify(body.categories), body.id).run();
+  } else if (t === 'brands' && body.id && typeof body.label === 'string') {
+    await env.DB.prepare('UPDATE brands SET label = ? WHERE id = ?').bind(body.label, body.id).run();
+  } else if (t === 'brands' && body.id && typeof body.enabled === 'boolean') {
+    await env.DB.prepare('UPDATE brands SET enabled = ? WHERE id = ?').bind(body.enabled ? 1 : 0, body.id).run();
   } else {
     return new Response('Bad request', { status: 400 });
   }

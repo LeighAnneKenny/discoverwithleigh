@@ -1,9 +1,12 @@
 ---
 import Eyebrow from './Eyebrow.astro';
-import { socials } from '../data/site';
 import type { SiteContent } from '../lib/content';
 
-const { contact } = Astro.props as { contact: SiteContent['contact'] };
+const { contact, socials: allSocials } = Astro.props as {
+  contact: SiteContent['contact'];
+  socials: SiteContent['socials'];
+};
+const socials = allSocials.filter((s) => s.show);
 
 // Sitekeys are public identifiers; the secret lives only as a Worker secret.
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '0x4AAAAAADwIcHofRL-bGbeM';

@@ -13,6 +13,7 @@ const shape = {
   influencer: defaults.influencer,
   reviews: defaults.reviews,
   contact: defaults.contact,
+  socials: defaults.socials,
 };
 export type SiteContent = typeof shape;
 
@@ -34,6 +35,7 @@ export interface MediaItem {
   h: number;
   categories: string[];
   id: number;
+  label?: string;
 }
 
 export async function loadGallery(): Promise<MediaItem[]> {
@@ -48,11 +50,12 @@ export async function loadGallery(): Promise<MediaItem[]> {
 }
 
 export async function loadBrands(): Promise<MediaItem[]> {
-  const { results } = await env.DB.prepare('SELECT id, r2_key, w, h FROM brands ORDER BY sort').all<{
+  const { results } = await env.DB.prepare('SELECT id, r2_key, w, h, label FROM brands WHERE enabled = 1 ORDER BY sort').all<{
     id: number;
     r2_key: string;
     w: number;
     h: number;
+    label: string;
   }>();
-  return results.map((r) => ({ id: r.id, url: `/media/${r.r2_key}`, w: r.w, h: r.h, categories: [] }));
+  return results.map((r) => ({ id: r.id, url: `/media/${r.r2_key}`, w: r.w, h: r.h, categories: [], label: r.label }));
 }

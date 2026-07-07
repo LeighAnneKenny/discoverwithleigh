@@ -27,6 +27,7 @@ const content: Record<string, unknown> = {
   influencer: site.influencer,
   reviews: site.reviews,
   contact: site.contact,
+  socials: site.socials,
 };
 stmts.push('DELETE FROM content;', 'DELETE FROM gallery;', 'DELETE FROM brands;');
 for (const [key, value] of Object.entries(content)) {

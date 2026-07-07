@@ -9,32 +9,75 @@ const { items } = Astro.props as { items: MediaItem[] };
     <Eyebrow>Trusted collaborations</Eyebrow>
     <h2 class="section-heading">Brands I’ve worked with</h2>
   </div>
-  <div class="brand-strip reveal" aria-label="Client brand logos">
-    {items.map((logo) => (
-      <div class="brand-tile">
-        <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
+  <div class="wrap reveal">
+    <div class="marquee" aria-label="Client brand logos">
+      <div class="marquee-track">
+        {[0, 1].map((dup) => (
+          <div class="marquee-half" aria-hidden={dup === 1 ? 'true' : undefined}>
+            {items.map((logo) => (
+              <figure class="brand-tile">
+                <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
+                {logo.label && <figcaption>{logo.label}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        ))}
       </div>
-    ))}
+    </div>
   </div>
 </section>
 
 <style>
-  .brand-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-    gap: 1px;
+  .marquee {
+    overflow: hidden;
     margin-top: 1rem;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
   }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: brands-marquee 50s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  /* two identical halves so the -50% loop point is seamless */
+  .marquee-half {
+    display: flex;
+    gap: 1px;
+    padding-right: 1px;
+  }
+  @keyframes brands-marquee {
+    to {
+      translate: -50% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+    }
+    .marquee-track {
+      animation: none;
+    }
+  }
+
   .brand-tile {
+    flex: none;
+    width: 9.5rem;
+    aspect-ratio: 1;
+    margin: 0;
+    padding: 1.2rem;
     background: var(--ink);
     box-shadow: 0 0 0 1px var(--line);
     display: grid;
     place-items: center;
-    aspect-ratio: 1;
-    padding: 1.4rem;
+    align-content: center;
+    gap: 0.5rem;
   }
   .brand-tile img {
     max-width: 100%;
+    max-height: 5.5rem;
+    width: auto;
     height: auto;
     filter: grayscale(1) brightness(1.6);
     opacity: 0.75;
@@ -47,5 +90,14 @@ const { items } = Astro.props as { items: MediaItem[] };
   /* the brightness lift is for dark tiles; on light tiles darken instead */
   :global([data-theme='light']) .brand-tile img {
     filter: grayscale(1) brightness(0.85);
+  }
+  .brand-tile figcaption {
+    font-family: var(--font-label);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-align: center;
   }
 </style>

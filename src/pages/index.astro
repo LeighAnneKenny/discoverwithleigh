@@ -29,12 +29,7 @@ const jsonLd = {
   address: { '@type': 'PostalAddress', addressLocality: 'Century City, Cape Town', addressCountry: 'ZA' },
   areaServed: 'Cape Town, South Africa',
   knowsAbout: [...c.services],
-  sameAs: [
-    'https://www.instagram.com/discover_with_leigh/',
-    'https://www.tiktok.com/@discover_with_leigh',
-    'https://www.facebook.com/leighannekennyza',
-    'https://www.youtube.com/channel/UCjyVZP6593CcIpepfOIKs1w',
-  ],
+  sameAs: c.socials.filter((s) => s.show).map((s) => s.url),
 };
 ---
 <Layout title={c.meta.title} description={c.meta.description}>
@@ -51,6 +46,6 @@ const jsonLd = {
   <CtaBand line={c.influencer.cta.line} label={c.influencer.cta.label} />
   <Reviews reviews={c.reviews} />
   <Brands items={brands} />
-  <Contact contact={c.contact} />
+  <Contact contact={c.contact} socials={c.socials} />
   <WhatsAppFab contact={c.contact} />
 </Layout>

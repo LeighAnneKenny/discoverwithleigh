@@ -8,11 +8,11 @@ export const meta = {
 };
 
 export const socials = [
-  { name: 'TikTok', url: 'https://www.tiktok.com/@discover_with_leigh' },
-  { name: 'Instagram', url: 'https://www.instagram.com/discover_with_leigh/' },
-  { name: 'Facebook', url: 'https://www.facebook.com/leighannekennyza' },
-  { name: 'YouTube', url: 'https://www.youtube.com/channel/UCjyVZP6593CcIpepfOIKs1w' },
-] as const;
+  { name: 'TikTok', url: 'https://www.tiktok.com/@discover_with_leigh', show: true },
+  { name: 'Instagram', url: 'https://www.instagram.com/discover_with_leigh/', show: true },
+  { name: 'Facebook', url: 'https://www.facebook.com/leighannekennyza', show: true },
+  { name: 'YouTube', url: 'https://www.youtube.com/channel/UCjyVZP6593CcIpepfOIKs1w', show: true },
+];
 
 export const nav = [
   { label: 'About', href: '#about' },

@@ -6,7 +6,7 @@ export const prerender = false;
 
 const KEYS = new Set([
   'meta', 'hero', 'about', 'services', 'photography',
-  'video', 'marketing', 'influencer', 'reviews', 'contact',
+  'video', 'marketing', 'influencer', 'reviews', 'contact', 'socials',
 ]);
 
 // Merged over site.ts defaults so newly added default fields show up in the form.
