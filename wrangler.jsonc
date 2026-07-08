@@ -26,8 +26,7 @@
 		}
 	],
 	"vars": {
-		// ponytail: placeholder recipient — swap when Leigh confirms her preferred inbox
-		"ENQUIRY_EMAIL": "discoverwithleigh@gmail.com",
+		// ENQUIRY_EMAIL is a Worker secret (wrangler secret put ENQUIRY_EMAIL) — no PII in source
 		// Cloudflare Access config for /admin — empty AUD means admin is locked (fail closed)
 		"ACCESS_TEAM_DOMAIN": "https://ancient-water-ea57.cloudflareaccess.com",
 		"ACCESS_AUD": "542fc32bcc774bc0da68f76185a86fb3724ff50390300e77f24e580b4ffc2823"

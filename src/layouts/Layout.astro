@@ -4,7 +4,8 @@ import '@fontsource-variable/nunito-sans';
 import '../styles/global.css';
 import { Image } from 'astro:assets';
 import logoLockup from '../assets/logo-lockup.png';
-import { meta, nav, contact } from '../data/site';
+import { meta, nav } from '../data/site';
+import { loadContent } from '../lib/content';
 
 interface Props {
   title?: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const { title = meta.title, description = meta.description } = Astro.props;
+const { contact } = await loadContent(); // footer email comes from D1, not source
 ---
 <html lang="en">
   <head>

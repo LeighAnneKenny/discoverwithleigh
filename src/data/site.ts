@@ -143,9 +143,11 @@ export const reviews = [
 ] as const;
 
 export const contact = {
-  phone: '+27 72 227 7016',
-  phoneHref: 'tel:+27722277016',
-  email: 'discoverwithleigh@gmail.com',
+  // PII lives in the D1 content row only (edited in admin), never in source.
+  // Fresh environments: fill these in via the admin Contact section after seeding.
+  phone: '',
+  phoneHref: '',
+  email: '',
   studio: 'Century City, Cape Town, South Africa',
   whatsappMessage: 'Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.',
 };

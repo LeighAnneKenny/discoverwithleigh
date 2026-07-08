@@ -1,7 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Eyebrow from '../components/Eyebrow.astro';
-import { contact } from '../data/site';
+import { loadContent } from '../lib/content';
+
+// served on demand: contact details come from D1, which isn't there at build time
+export const prerender = false;
+
+const { contact } = await loadContent();
 ---
 <Layout title="Privacy Policy | Discover With Leigh" description="How Discover With Leigh collects, uses, and protects your personal information.">
   <section class="section policy">
