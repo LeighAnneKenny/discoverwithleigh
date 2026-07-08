@@ -1,12 +1,14 @@
 # PRD — Discover With Leigh v2
 
-**Date:** 2026-07-05 · **Status:** Approved
+**Started:** 2026-07-05 · **Last updated:** 2026-07-09 · **Status:** Built & deployed to preview; paused for Leigh's review, then cutover.
+
+Item numbers are stable IDs (referenced by commits and notes); sections below are ordered by what happens next.
 
 ## Vision
 
 Replace the static WordPress/Divi export with a fast, owned, editable site — same brand, same content, same URL — where Leigh-Anne manages content herself and nothing silently rots.
 
-## Problems with the current site
+## Problems with the original site
 
 1. **Dead contact form** — the static export severed WPForms from its backend; the form posts to `index.html` and discards submissions.
 2. **Frozen social feeds** — Instagram/TikTok sections are snapshots from export day.
@@ -18,128 +20,147 @@ Replace the static WordPress/Divi export with a fast, owned, editable site — s
 | Concern | Choice |
 |---|---|
 | Framework | Astro (`src/` → `dist/`), non-destructive alongside the old export until cutover |
-| Hosting | Cloudflare Worker — edge-renders the public page from D1, cached at the edge, cache purged on admin save |
+| Hosting | Cloudflare Worker — renders the public page from D1 per request |
 | Content store | D1 (copy, testimonials, gallery metadata, brand logos, enquiries) |
 | Images | R2, resized on upload |
-| Admin auth | Cloudflare Access on `/admin` |
+| Admin auth | Cloudflare Access on `/admin` + JWT verification in the Worker |
 | Spam protection | Cloudflare Turnstile |
 | Enquiry email | Cloudflare Email Sending — Worker binding, no third party. Sends to Leigh's verified destination address are quota-free on all plans. (Supersedes Resend, 2026-07-05.) |
-| CI/CD | GitHub Actions → `wrangler deploy` on push to main |
+| CI/CD | GitHub Actions — test-gated `wrangler deploy` on push to main (validated 2026-07-08) |
+| Tests | Vitest (`npm test`, 19 API tests in workerd) + Playwright (`npx playwright test`, 60 UI tests, 6 device profiles) |
 
 ## Brand
 
-Dark/black backgrounds, white text, teal accent `#00a79d`, white logo with teal aperture. Headings: custom "Vogue Sans" (`wp-content/uploads/et-fonts/vogue-sans-medium.ttf`). Body: Montserrat / Nunito Sans / Open Sans.
+Dark/black backgrounds, white text, teal accent `#00a79d`, white logo with teal aperture. Headings: custom "Vogue Sans" (self-hosted). Body: Montserrat / Nunito Sans.
 
-## Content inventory (from current site)
+## Content inventory
 
-Hero → About → Services overview → Photography (filterable gallery: Product / Lifestyle / Portraits / Live Music / Property / Weddings) → Video (TikTok) → Social Media Management (4-step Discovery Process) → Influencer Campaigns → Client Reviews (4 testimonials) → Brand logos (8) → Contact (details, form, WhatsApp CTA) → Privacy Policy page.
+Hero → About → Services overview → Photography (filterable gallery: Product / Lifestyle / Portraits / Live Music / Property / Weddings) → Video (TikTok) → Social Media Management (4-step Discovery Process) → Influencer Campaigns → Client Reviews (4 testimonials) → Brand logos → Contact (details, form, WhatsApp CTA) → Privacy Policy page.
 
 ## Use cases & success criteria
 
 | # | Use case | Success criteria |
 |---|---|---|
-| 1 | Visitor browses portfolio on mobile | Lighthouse ≥ 90 all categories; LCP < 2.5s |
-| 2 | Visitor filters gallery by category | Instant client-side filtering, six categories preserved |
-| 3 | Visitor sends an enquiry | Stored in D1, email via Resend lands in Leigh's inbox, Turnstile blocks bots |
-| 4 | Visitor taps WhatsApp / social CTAs | All existing links preserved |
-| 5 | Admin edits copy, testimonials, brand logos | Login via Cloudflare Access; changes live within minutes, no developer involved |
-| 6 | Admin manages gallery | Upload to R2 with category + ordering |
-| 7 | Admin reviews enquiries | Submissions list in admin panel |
-| 8 | Developer deploys | Push to main → live in < 5 min; rollback = `git revert` |
-| 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept |
+| 1 | Visitor browses portfolio on mobile | Lighthouse ≥ 90 all categories; LCP < 2.5s *(formal verification = item 12)* |
+| 2 | Visitor filters gallery by category | Instant client-side filtering, six categories preserved ✅ |
+| 3 | Visitor sends an enquiry | Stored in D1, email via Cloudflare Email Sending lands in Leigh's inbox, Turnstile blocks bots ✅ (email pending domain onboarding at cutover) |
+| 4 | Visitor taps WhatsApp / social CTAs | All existing links preserved ✅ |
+| 5 | Admin edits copy, testimonials, brand logos | Login via Cloudflare Access; changes live within minutes, no developer involved ✅ |
+| 6 | Admin manages gallery | Upload to R2 with category + ordering ✅ |
+| 7 | Admin reviews enquiries | Submissions list in admin panel ✅ |
+| 8 | Developer deploys | Push to main → tests → live in < 5 min; rollback = `git revert` (pipeline validated; opens at cutover) |
+| 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept (redirects = item 12) |
 
-## Brand mark fidelity — ✅ SIGNED OFF 2026-07-06
+---
 
-Resolved in design session with Caveshen:
-- **Header**: Leigh's original lockup (Celtic knot + aperture centre + wordmark with underlined O + tagline) used 1:1 as a trimmed transparent image (`src/assets/logo-lockup.png`), build-optimised.
-- **Footer**: same lockup left-aligned as a signature; legal lines (privacy / copyright / email) stacked right.
-- **Hero**: parametric SVG aperture (`Aperture.astro` — blade count, radii, swirl, gap all tunable) as the O in DISCOVER. Approved at **6 blades** (deliberate deviation from the logo's 7). On load it performs a **shutter click**: open → snap closed → reopen, ~2.2s, reduced-motion renders static.
-- Light mode will need the dark logo variant (see Next run item 6).
+# NEXT: pre-cutover work
 
-## Admin v2 (feedback, 2026-07-06)
-
-The v1 admin edits existing values only. Wanted next: add/remove items in list content (reviews, services, process steps), and longer-term add/remove/reorder whole sections of the site — scope to be workshopped before build. "We could do A LOT MORE here" — Caveshen.
-
-*Workshopped and shipped 2026-07-07:* every array in the content forms now has per-item move/remove and an Add button (new item = blanked clone of the list's shape) — covers reviews, services, process steps, about paragraphs and the TikTok pool in one generic mechanism. Booleans render as checkboxes. **Whole-section add/remove/reorder: deferred entirely** (decision 2026-07-07 — sections are bespoke components, a developer is needed regardless; revisit if a real need appears).
-
-*Dev note:* local admin requires `npx wrangler dev --host localhost` — without `--host`, wrangler simulates the production route host and the loopback-only auth bypass (correctly) refuses. Astro 7's own dev daemon (`npm run dev`) currently 500s on all admin routes — upstream logger bug in its workerd runner.
-
-## Next run (feedback, 2026-07-06)
-
-1. ✅ *Shipped 2026-07-06.* **Gallery → filterable carousel (mobile-first).** The 53-image masonry punishes phone users: it collapses to one column and forces an enormous scroll between sections. Replace with a CSS scroll-snap horizontal carousel (native swipe on mobile, prev/next arrows on desktop, no carousel library), filter tabs above styled unmistakably as tabs. This also restores the original site's form. *(The filter click-handling bug — author `display:block` overriding the `hidden` attribute — was found and fixed 2026-07-06.)*
-2. ✅ *Shipped 2026-07-06.* **Floating WhatsApp CTA.** Reintroduce the bottom-right floating WhatsApp button from the old site, opening a chat with pre-filled message text (e.g. "Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.") via a wa.me link built from the business number. Message copy editable in admin content.
-3. ✅ *Shipped 2026-07-06 (carousel; admin curation pending admin v2).* **TikTok rotation.** *(Revised 2026-07-06 after review: two side-by-side embeds looked cramped.)* Single embed in a swipeable scroll-snap carousel: the pool of video IDs is rotated server-side so each page load *starts* on a random video, then the visitor swipes (arrows on desktop) through the rest. Pool seeded with the newest 8 videos from the live @discover_with_leigh profile + the 2 originals (10 total), stored in D1 `video.tiktokIds`. **Future (admin v2):** the ID pool must be curatable in the admin section — add/remove/reorder IDs without a developer.
-4. ✅ *Shipped 2026-07-07 (both parts).* **Brands section v2** *(expanded 2026-07-06; see also Bug fixes #2).* Two-parter:
-   - **(a) Bug fix — contain the strip.** Marquee chosen at workshop (2026-07-07): auto-scrolling single row inside standard section width, pause on hover, edge-fade mask, reduced-motion renders static/scrollable. Pure CSS (duplicated track, −50% translate loop).
-   - **(b) Enhancement — admin-customisable tiles.** Migration 0003 added `label TEXT` + `enabled INTEGER` to `brands` (applied local + remote); tiles render optional captions and hidden tiles are filtered in SQL; admin Brands cards grew a label field and a Shown/Hidden toggle.
-5. 📨 *Handed to Leigh 2026-07-07 — no site code; configured in the WhatsApp Business app on the phone holding the business contact number.* **WhatsApp auto-response.** (Added 2026-07-06.) Two features under Settings → Business tools, official guides:
-   - **Greeting message** — https://faq.whatsapp.com/501866148528310 — auto-replies to first-time enquirers (or after 14 days' silence); this is what answers the website FAB's pre-filled message. Set recipients to "Everyone". Draft copy: *"Hi! Thanks for reaching out to Discover With Leigh 📸 I've seen your message and I'll get back to you personally within a few hours — usually much sooner. To speed things along, tell me a bit about what you have in mind: the type of shoot or campaign, and any dates you're eyeing."*
-   - **Away message** — https://faq.whatsapp.com/2565868990219715 — out-of-hours cover for repeat enquirers. The "outside business hours" schedule requires business hours set on the profile first. Draft copy: *"Thanks for your message! I'm out on a shoot right now 🎥 — I'll reply as soon as I'm back. If it's urgent, you can also email [the business email]."*
-   - **Leigh's decisions:** response-time promise (only promise what she'll keep), away schedule vs always-on, emoji tone, and completing the business profile (hours, description, website link → new site at cutover). The Business Platform/API was considered and rejected — overkill for a one-person studio.
-6. ✅ *Shipped 2026-07-06.* **Light mode + theme toggle.** Token swap under `[data-theme="light"]`; default follows `prefers-color-scheme`, choice persisted in localStorage; sun/moon toggle in the top bar. *As-built revisions:* light palette restores the **original WordPress design** (off-white `#faf9f6` body, black bands) rather than inventing one; **header, footer and CTA bands stay dark in both themes** (`.always-dark` token utility) so Leigh's white-on-dark lockup never needs a dark variant; hero pins dark-over-photo colours in both themes; `color-scheme` declared per theme (native controls + polite auto-dark opt-out — note: force-dark browser features/extensions like Dark Reader still re-tint, nothing opts out of those).
-
-## Bug fixes (reported 2026-07-06)
-
-1. **Contact form fields overflow their card on desktop.** Inputs/textarea have no explicit `width`, so their intrinsic default width (~239px, the UA's `size="20"` rendering) acts as an automatic minimum inside the form's CSS grid — `.form-row`'s `1fr 1fr` tracks can't shrink below it. At desktop widths the form column (6fr ≈ 532px) sits just below the threshold, so field rows render ~496px wide in a ~450px content box and punch through the card's right padding/border. Mobile is unaffected (single column = full width). *Fix:* `width: 100%; min-width: 0` on `input, textarea` and `minmax(0, 1fr)` tracks on `.form-row`.
-2. ✅ *Fixed 2026-07-07 (marquee — see Next run item 4a).* **Brands strip spans the full window on desktop.** `.brand-strip` deliberately sits outside `.wrap`, so the `auto-fill` grid grows to 12+ tiles per row on wide screens — the only section ignoring the 72rem container convention. Fine on mobile (2–3 columns), sprawling on desktop. *Fix:* contain the strip to standard section width; presentation decision (marquee vs carousel vs capped grid) folded into Next run item 4, which this bug supersedes the "full width becomes intentional" framing of. *(Marquee rationale accepted 2026-07-06; build deferred — not yet greenlit.)*
-3. ✅ *Fixed 2026-07-07.* **WhatsApp triple-redundancy in the contact section.** WhatsApp appears three times in one viewport: the "WhatsApp to set up a meeting" CTA button, the text socials list beneath it, and the floating FAB. WhatsApp is a contact channel, not social presence — it doesn't belong in the socials list. *Fix (quick):* drop WhatsApp from the list and replace the remaining text links (TikTok, Instagram, Facebook, YouTube) with standardised inline-SVG platform icons, aria-labelled, teal hover — matching the FAB's hand-inlined-glyph approach. *Admin customisability of the list → Next run item 7.*
-4. ✅ *Fixed 2026-07-07 (reveal moved from tiles to the list; verified at 1.25 device scale).* **Discovery Process dividers render inconsistently.** (Reported 2026-07-07.)
-5. ✅ *Fixed 2026-07-08 (found and verified by the new Playwright suite, item 10).* **Horizontal scroll on mobile; burger menu and theme toggle pushed off-screen.** The Video section's mobile grid used a bare `1fr` track, whose *automatic minimum* inherits content's intrinsic width — the TikTok carousel's five 325px slides (~1800px intrinsic) inflated the track, widening the page ~5× on phones. The fixed header spanned that width, parking the burger/toggle at ~1276px on a 360px screen. Same disease as bug #1, grid-track form. *Fix:* `minmax(0, 1fr)` on the mobile track (the idiom the desktop columns already used). The seam between tiles 1 and 2 vanishes while 2|3 and 3|4 draw fine. The grid fakes its dividers with `gap: 1px` over a `--line` background (`Marketing.astro`), and each `<li>` is an individual `.reveal` — its `translate` transform promotes the tile to a composited layer snapped to *device* pixels independently of grid layout, so at fractional display scaling a tile can overpaint the 1px gap beside it. Which seams survive is rounding luck. *Fix:* reveal the whole `<ol class="process">` as one block instead of per-tile (deletes the per-tile transforms — root cause); if hairlines still vary at odd zooms, replace the background-bleed technique with real `border` on tiles.
-
-7. ✅ *Shipped 2026-07-07 (with admin v2 list editing, as planned).* **Admin-customisable social links.** (Added 2026-07-06; pairs with Bug fixes #3.) Socials promoted to a `socials` content section (platform name + URL, per-link `show` flag), editable in admin under "Social links"; icons matched by platform name with a text fallback for unrecognised platforms; the homepage JSON-LD `sameAs` derives from the visible links.
-
-8. ✅ *Shipped 2026-07-07 — 19 tests, `npm test`, ~1.5s.* **Unit tests for the API surface.** (Added 2026-07-07 — retro-fit, deliberately.) *As-built:* pool-workers 0.18 (vitest 4) configures via the `cloudflareTest()` Vite plugin (not `defineWorkersConfig`); bindings declared inline in `vitest.config.ts` so tests never depend on `dist/` or real resources; `astro:middleware` aliased to an identity stub; real migrations applied per suite; Turnstile mocked by stubbing global `fetch` (the pool's `fetchMock` was removed in 0.18). Vitest + `@cloudflare/vitest-pool-workers` so tests run in workerd against real D1/R2 bindings. Priority order: middleware auth (fail-closed on missing config, bypass requires flag AND loopback host), `/api/contact` (honeypot, Turnstile fail-closed, required fields, enquiry stored even when email fails), `loadContent` one-level merge, admin media PATCH branching (order vs categories vs label vs enabled). Components stay untested — the visual QA rig covers them. Until this lands, every ship keeps its end-to-end curl verification.
-
-9. ✅ *Shipped 2026-07-08 (all but the history rewrite, which stays a cutover task).* **PII out of source.** (Added 2026-07-07.) *As-built:* contact phone/phoneHref/email blanked in site.ts; Layout + privacy-policy pull contact via `loadContent()` (privacy now `prerender = false`); `ENQUIRY_EMAIL` is a Worker secret; llms.txt points to the site instead of listing email/phone (the homepage JSON-LD still serves both, from D1); PRD wording genericised. Tracked source verified PII-free except the WP export (deleted at cutover). The business phone and email are *published* on the rendered site by design — this item is about keeping them out of the *repo*, so clones/forks and a future public GitHub carry no PII. Scope:
-   - Blank `contact.phone`, `contact.phoneHref` and `contact.email` in `src/data/site.ts` — the live values already exist in the D1 `content` row and stay editable in admin. Fresh environments get seeded blanks and are filled in via admin.
-   - `Layout.astro` (footer email) and `privacy-policy.astro` import `contact` from site.ts directly — wire both through `loadContent()`; the privacy page flips to `prerender = false` (no DB at build time).
-   - `ENQUIRY_EMAIL` moves from `wrangler.jsonc` vars to a Worker secret (same handling as `TURNSTILE_SECRET`).
-   - Docs sweep: keep phone/email out of PRD and README wording (done for item 5, 2026-07-07).
-   - **Git history:** values remain in past commits — squash/rewrite history (fresh squash or `git filter-repo`) before the repo is shared or made public; natural moment is cutover, alongside deleting the WordPress export.
-
-10. ✅ *Shipped 2026-07-08 — 60 tests, `npx playwright test`, ~30s.* **Responsive UI test suite.** Playwright across six rendering profiles covering the agreed device matrix: desktop 16:9 at 1080p/1440p/4K (Chromium), iPhone 12/13/14 (one profile, 390×844@3x) and iPhone 15 (393×852@3x) on real WebKit, Galaxy S22–S25 (one profile, 360×780@3x, Android UA + touch) on Chromium. Per profile: horizontal-overflow assertion with offender diagnostics (both themes), burger/nav behaviour, theme toggle flip + persistence, logo→home, WhatsApp FAB placement/tappability/href, gallery scroll/arrows/filters, contact-field containment (bug #1 regression guard), Turnstile presence, and full-page screenshot artifacts per profile/theme in `e2e-artifacts/`. Hermetic: third-party requests blocked; `webServer` builds and boots `wrangler dev --host localhost` automatically. Run alongside `npm test` (API suite) before any deploy.
-
-11. **Site insights in admin.** (Added 2026-07-09.) A "live snapshot of how the site is being used" — an Insights tab in the existing admin: a few headline numbers and simple inline-SVG graphs, 7-day view by default with a 30-day toggle, nothing older. Constraints: lean, free, useful, performant. Two data sources, split by who already has the data:
-    - **Traffic (Cloudflare's data, zero storage ours):** visits, page views, top referrers, top countries — pulled server-side from the free GraphQL Analytics API (RUM datasets, fed by the Web Analytics beacon added at cutover) using a read-scoped token stored as a Worker secret. *Verify at build: rum dataset retention on the free plan covers 30 days.*
-    - **Behaviour (what Cloudflare can't see, in D1, bounded):** one `metrics(day, metric, count)` table with upsert-increment; ~15 metrics × 35 days ≈ 500 rows hard ceiling, self-pruned on write. Collected via a single batched `navigator.sendBeacon` per visit on pagehide (flags set by the existing reveal IntersectionObserver + click handlers — no libraries, no cookies, no identifiers, POPIA-clean). Metrics: section-reach funnel (how far down visitors scroll), WhatsApp FAB taps, contact form starts (first focus), gallery filter usage per category, social icon clicks per platform.
-    - **Enquiry funnel without new tracking:** successful submissions = `enquiries` rows per day (already stored); form errors counted server-side in the existing `/api/contact` handler (Turnstile/validation rejections). Starts vs errors vs submissions = abandonment and friction. Explicit decision 2026-07-09: client-side "submit clicked" tracking is redundant and excluded.
-    - Build after cutover (needs the Web Analytics beacon live on the apex).
-
-12. **Launch polish: share cards, redirects, a11y, Lighthouse.** (Added 2026-07-09; buildable pre-cutover.)
+12. **Launch polish: share cards, redirects, a11y, Lighthouse.** (Added 2026-07-09; buildable now.)
     - **`og:image` + `twitter:card` + `apple-touch-icon`** — shared links (WhatsApp/DMs — the word-of-mouth channel) currently render bare cards; one branded image makes every share a mini-advert.
-    - **Legacy URL redirects + custom 404** — old WordPress URLs (`?p=`, `privacy-policy.html`, `index.html`) 301 to the right places at cutover; a branded 404 for everything else. Completes the SEO-continuity success criterion.
+    - **Legacy URL redirects + custom 404** — old WordPress URLs (`?p=`, `privacy-policy.html`, `index.html`) 301 to the right places; a branded 404 for everything else. Completes success criterion 9.
     - **Accessibility test** — `@axe-core/playwright` scan added to the UI suite across all six profiles.
-    - **Lighthouse ≥ 90 verification** — the PRD's first success criterion, never formally measured; verify pre-cutover and record scores.
-    - *(No code — folded into the cutover runbook: Google Search Console + Bing Webmaster registration and sitemap submission (ChatGPT's web search uses Bing's index), Google Business Profile linked to the site + a client Google-review habit, DMARC check at email onboarding. Deliberate DON'T: no self-serving Review/aggregateRating schema on own testimonials — against Google guidelines.)*
+    - **Lighthouse ≥ 90 verification** — success criterion 1, never formally measured; verify and record scores.
 
-13. **Pre-baked Q&A (rates etc.) — admin-configurable, discreetly served.** (Added 2026-07-09; workshopped same day, decisions final.) Leigh's rates are deliberately absent from the page — but that forces contact for questions a canned answer could settle. Design:
+# WAITING ON LEIGH
+
+- **Site review** — the current pause; feedback may spawn one more work round.
+- **Email destination verify click** — registered 2026-07-05; prerequisite for email onboarding at cutover.
+- 📨 **Item 5 — WhatsApp auto-response.** (Added 2026-07-06; handed to Leigh 2026-07-07. No site code; configured in the WhatsApp Business app on the phone holding the business contact number, under Settings → Business tools.)
+  - **Greeting message** — https://faq.whatsapp.com/501866148528310 — auto-replies to first-time enquirers (or after 14 days' silence); this answers the website FAB's pre-filled message. Set recipients to "Everyone". Draft copy: *"Hi! Thanks for reaching out to Discover With Leigh 📸 I've seen your message and I'll get back to you personally within a few hours — usually much sooner. To speed things along, tell me a bit about what you have in mind: the type of shoot or campaign, and any dates you're eyeing."*
+  - **Away message** — https://faq.whatsapp.com/2565868990219715 — out-of-hours cover for repeat enquirers. The "outside business hours" schedule requires business hours set on the profile first. Draft copy: *"Thanks for your message! I'm out on a shoot right now 🎥 — I'll reply as soon as I'm back. If it's urgent, you can also email [the business email]."*
+  - **Leigh's decisions:** response-time promise (only promise what she'll keep), away schedule vs always-on, emoji tone, completing the business profile (hours, description, website link → new site at cutover). The Business Platform/API was considered and rejected — overkill for a one-person studio.
+
+# CUTOVER (phase 5 runbook)
+
+In rough order:
+
+1. **Email Sending onboarding** — onboard `discoverwithleigh.co.za` (dashboard: Email Service → Email Sending → Onboard Domain); check DMARC while there.
+2. **GH repo secrets** — `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`; token already has all permissions, pipeline already validated → paste-and-go.
+3. **Merge to `main`** — the deploy gate opens; watch the first CI deploy.
+4. **Apex DNS → Worker** — add `discoverwithleigh.co.za` as a custom domain alongside preview. The actual cutover moment.
+5. **WAF rate-limiting rule** on the zone (abuse protection; DDoS is covered free by default).
+6. **AI Crawl Control → ALLOW** — Cloudflare blocks AI crawlers by default; we explicitly welcome them (see AI & search discoverability).
+7. **Web Analytics beacon** — enable on the zone (free, privacy-first RUM; feeds item 11).
+8. **Search registration** — Google Search Console **and** Bing Webmaster Tools, submit the sitemap to both (ChatGPT's web search uses Bing's index).
+9. **Google Business Profile** — link to the site, consistent name/phone/area; start a client Google-review habit (third-party reviews are what Google and LLMs trust). *Deliberate DON'T: no self-serving Review/aggregateRating schema on own testimonials — against Google guidelines.*
+10. **Delete the WordPress export** (~180 tracked files) — the old site retired.
+11. **Git history rewrite** — squash/`git filter-repo` to purge PII and the export from history. The repo is public, so this is wanted, not optional. Implies a force-push and fresh clones → last act, done once, after everything is merged.
+
+**Post-cutover verifications:** SEO parity (meta/OG, sitemap, `/privacy-policy`), contact form email lands in Leigh's inbox from the live domain, Playwright suite run against production.
+
+# POST-CUTOVER features
+
+11. **Site insights in admin.** (Added 2026-07-09; needs the Web Analytics beacon live.) A "live snapshot of how the site is being used" — an Insights tab in the existing admin: a few headline numbers and simple inline-SVG graphs, 7-day view by default with a 30-day toggle, nothing older. Constraints: lean, free, useful, performant. Two data sources, split by who already has the data:
+    - **Traffic (Cloudflare's data, zero storage ours):** visits, page views, top referrers, top countries — pulled server-side from the free GraphQL Analytics API (RUM datasets) using a read-scoped token stored as a Worker secret. *Verify at build: RUM dataset retention on the free plan covers 30 days.*
+    - **Behaviour (what Cloudflare can't see, in D1, bounded):** one `metrics(day, metric, count)` table with upsert-increment; ~15 metrics × 35 days ≈ 500 rows hard ceiling, self-pruned on write. Collected via a single batched `navigator.sendBeacon` per visit on pagehide (flags set by the existing reveal IntersectionObserver + click handlers — no libraries, no cookies, no identifiers, POPIA-clean). Metrics: section-reach funnel, WhatsApp FAB taps, contact form starts (first focus), gallery filter usage per category, social icon clicks per platform.
+    - **Enquiry funnel without new tracking:** successful submissions = `enquiries` rows per day (already stored); form errors counted server-side in the existing `/api/contact` handler. Starts vs errors vs submissions = abandonment and friction. *Decision 2026-07-09: client-side "submit clicked" tracking is redundant and excluded.*
+
+13. **Pre-baked Q&A (rates etc.) — admin-configurable, discreetly served.** (Added and workshopped 2026-07-09; decisions final.) Leigh's rates are deliberately absent from the page — but that forces contact for questions a canned answer could settle.
     - **Content:** a `qa` content section in D1 — question / answer / `show` / `public` per item — edited with the existing admin v2 list machinery.
-    - **Exposure — split by sensitivity (decision):** items marked `public: false` (rates) exist *only* in the on-site widget; items marked `public: true` (turnaround, travel radius, process) are additionally published to a crawlable endpoint (llms.txt becomes a dynamic route rendering them) so external LLMs can answer them. Principle acknowledged: LLMs can only answer what is publicly readable — rates stay in Leigh's control.
-    - **Interaction — question chips (decision):** tappable pre-set questions revealing canned answers, ending in a WhatsApp/contact CTA. Zero inference cost, zero hallucination risk, no chatbot theatre. Workers AI free-text matching is an explicit *maybe-later*, only after the content settles — and rate answers would still be served verbatim, never model-paraphrased.
-    - **Placement — "Questions?" pill above the WhatsApp FAB (decision):** compact panel, available throughout the scroll, before contact is initiated; styled to the site's type system, reduced-motion aware.
-    - Build post-cutover alongside items 11; Playwright coverage (pill placement, panel open/close, chips render from D1) added with the feature.
+    - **Exposure — split by sensitivity (decision):** `public: false` items (rates) exist *only* in the on-site widget; `public: true` items (turnaround, travel radius, process) are additionally published to a crawlable endpoint (llms.txt becomes a dynamic route rendering them) so external LLMs can answer them. Principle: LLMs can only answer what is publicly readable — rates stay in Leigh's control.
+    - **Interaction — question chips (decision):** tappable pre-set questions revealing canned answers, ending in a WhatsApp/contact CTA. Zero inference cost, zero hallucination risk, no chatbot theatre. Workers AI free-text matching is an explicit *maybe-later* — and rate answers would still be served verbatim, never model-paraphrased.
+    - **Placement — "Questions?" pill above the WhatsApp FAB (decision):** compact panel, available throughout the scroll; styled to the site's type system, reduced-motion aware. Playwright coverage added with the feature.
 
-## AI & search discoverability (feedback, 2026-07-06)
+---
 
-The site should be findable and summarisable by search engines *and* LLM crawlers — the goal is appearing when someone asks an assistant for photographers / digital marketers in Cape Town. Welcome crawlers; block nothing that reads politely. What we prevent is abuse, not access: no full-site scraping abuse or DDoS (Cloudflare's free unmetered DDoS protection covers the latter; add a WAF rate-limiting rule at cutover).
+# SHIPPED
 
-Implementation: robots.txt (allow all, disallow /admin + /api, sitemap reference), /llms.txt business summary, JSON-LD ProfessionalService structured data on the homepage, sitemap.xml. At cutover: ensure Cloudflare's "Block AI bots" / AI Crawl Control is set to ALLOW AI crawlers on this zone — Cloudflare blocks them by default on newer zones.
+## Features (Next-run items, feedback 2026-07-06 onward)
+
+1. ✅ *2026-07-06.* **Gallery → filterable carousel (mobile-first).** CSS scroll-snap horizontal carousel (native swipe, desktop arrows, no library), filter tabs styled as tabs. *(Filter click-handling bug — author `display:block` overriding `hidden` — found and fixed same day.)*
+2. ✅ *2026-07-06.* **Floating WhatsApp CTA.** Bottom-right FAB opening a chat with pre-filled message via a wa.me link built from the business number; message copy admin-editable.
+3. ✅ *2026-07-06.* **TikTok rotation.** *(Revised after review: two side-by-side embeds looked cramped.)* Single embed in a swipeable scroll-snap carousel; the 10-ID pool (newest 8 from the live profile + 2 originals, in D1 `video.tiktokIds`) is rotated server-side so each load starts on a random video. Pool is admin-curatable via the item-A list editing.
+4. ✅ *2026-07-07 (both parts).* **Brands section v2.** (a) Strip contained as a pure-CSS marquee — single row, pause on hover, edge-fade mask, reduced-motion static (chosen at workshop; also closes bug #2). (b) Admin-customisable tiles: migration 0003 added `label` + `enabled` to `brands` (local + remote); tiles render optional captions, hidden tiles filtered in SQL; admin cards grew a label field and Shown/Hidden toggle.
+6. ✅ *2026-07-06.* **Light mode + theme toggle.** Token swap under `[data-theme="light"]`, default follows `prefers-color-scheme`, persisted in localStorage, sun/moon toggle. *As-built:* light palette restores the original WordPress design (off-white `#faf9f6`, black bands); header/footer/CTA bands stay dark in both themes (`.always-dark` utility) so the white lockup never needs a dark variant; `color-scheme` declared per theme (note: force-dark extensions like Dark Reader still re-tint — nothing opts out of those).
+7. ✅ *2026-07-07.* **Admin-customisable social links.** Socials promoted to a `socials` content section (name + URL + per-link `show`), edited under "Social links"; inline-SVG icons matched by platform name with text fallback; homepage JSON-LD `sameAs` derives from visible links.
+8. ✅ *2026-07-07.* **API test suite** — 19 tests, `npm test`, ~1.5s, running in workerd against real D1: middleware auth (fail-closed, bypass requires flag AND loopback), `/api/contact` (honeypot, Turnstile fail-closed, validation, enquiry stored even when email fails), `loadContent` merge, media PATCH branching. *As-built notes:* pool-workers 0.18 (vitest 4) configures via the `cloudflareTest()` Vite plugin; bindings inline (no `dist/` dependency); `astro:middleware` aliased to an identity stub; Turnstile mocked by stubbing global `fetch` (the pool's `fetchMock` was removed).
+9. ✅ *2026-07-08 (all but the history rewrite → cutover step 11).* **PII out of source.** Contact phone/email are *published* on the rendered site by design; this keeps them out of the *repo*. Blanked in `site.ts` (live values in D1, admin-edited; fresh environments fill in via admin); Layout footer + privacy page pull via `loadContent()` (privacy now `prerender = false`); `ENQUIRY_EMAIL` is a Worker secret; llms.txt refers to the site instead of listing them; docs genericised. Tracked source verified PII-free except the WP export.
+10. ✅ *2026-07-08.* **Responsive UI test suite** — 60 tests, `npx playwright test`, ~30s. Six profiles covering the agreed matrix: desktop 16:9 at 1080p/1440p/4K (Chromium), iPhone 12/13/14 (390×844@3x) + iPhone 15 (393×852@3x) on real WebKit, Galaxy S22–S25 (360×780@3x, Android UA + touch) on Chromium. Per profile: horizontal-overflow assertion with offender diagnostics (both themes), burger/nav, theme toggle persistence, logo→home, FAB placement/tappability/href, gallery scroll/arrows/filters, contact containment (bug #1 guard), Turnstile presence, full-page screenshots to `e2e-artifacts/`. Hermetic (third-party blocked); `webServer` boots build + `wrangler dev --host localhost` itself.
+
+## Admin v2 (feedback 2026-07-06 → shipped 2026-07-07)
+
+v1 edited existing values only. Shipped: every array in the content forms has per-item move/remove and an Add button (new item = blanked clone of the list's shape) — covers reviews, services, process steps, about paragraphs, the TikTok pool and socials in one generic mechanism; booleans render as checkboxes. **Whole-section add/remove/reorder: deferred entirely** (decision 2026-07-07 — sections are bespoke components, a developer is needed regardless; revisit if a real need appears).
+
+*Dev note:* local admin requires `npx wrangler dev --host localhost` — without `--host`, wrangler simulates the production route host and the loopback-only auth bypass (correctly) refuses. Astro 7's dev daemon (`npm run dev`) currently 500s on all admin routes — upstream logger bug in its workerd runner.
+
+## Brand mark fidelity (signed off 2026-07-06)
+
+- **Header/footer:** Leigh's original lockup used 1:1 as a trimmed transparent image, build-optimised; footer left-aligned as a signature with legal lines stacked right.
+- **Hero:** SVG aperture as the O in DISCOVER, **6 blades** approved (deliberate deviation from the logo's 7); shutter-click on load (open → snap closed → reopen), reduced-motion static. Geometry frozen to literal paths 2026-07-08 (params in the component header; regenerate with the same maths if retuned).
+- No dark logo variant exists or is needed — the always-dark header/footer keep the white lockup correct in both themes.
+
+## CI (shipped & validated 2026-07-08)
+
+`.github/workflows/ci.yml` — test job: vitest API suite, then migrations + seed into local D1/R2 (with dummy contact values, since source PII is blanked) and the Playwright matrix with screenshot artifacts; no cloud credentials. Deploy job: `main` only, gated on tests, needs the two GH secrets (cutover step 2). Validated on real runs: deploy gate held, Playwright `github` reporter surfaces failures as annotations, run #3 fully green.
+
+## Bug fixes
+
+1. ✅ *2026-07-06.* **Contact form fields overflow their card on desktop.** Inputs' intrinsic default width (~239px, UA `size="20"`) acted as an automatic minimum inside the form grid; `1fr` tracks couldn't shrink below it. *Fix:* `width: 100%; min-width: 0` on fields, `minmax(0, 1fr)` tracks.
+2. ✅ *2026-07-07 (marquee — item 4a).* **Brands strip spans the full window on desktop.** `.brand-strip` sat outside `.wrap`, growing to 12+ tiles per row. *Fix:* contained marquee.
+3. ✅ *2026-07-07.* **WhatsApp triple-redundancy in the contact section.** CTA button + socials list + FAB in one viewport; WhatsApp is a contact channel, not social presence. *Fix:* dropped from the list; remaining socials became inline-SVG icons (aria-labelled, teal hover). Admin customisability → item 7.
+4. ✅ *2026-07-07 (verified at 1.25 device scale).* **Discovery Process dividers render inconsistently.** Seam 1|2 vanished while 2|3 and 3|4 drew fine. The grid fakes dividers with `gap: 1px` over a `--line` background, and each `<li>` was an individual `.reveal` — its transform promotes the tile to a composited layer snapped to *device* pixels independently of grid layout, so at fractional display scaling a tile can overpaint the 1px gap beside it; which seams survive is rounding luck. *Fix:* reveal the whole `<ol>` as one block (deletes the per-tile transforms — root cause). Fallback if hairlines ever vary at odd zooms: real borders on tiles.
+5. ✅ *2026-07-08 (found and verified by the Playwright suite).* **Horizontal scroll on mobile; burger menu and theme toggle pushed off-screen.** The Video section's mobile grid used a bare `1fr` track, whose automatic minimum inherits content's intrinsic width — the TikTok carousel's five 325px slides (~1800px intrinsic) inflated the track, widening the page ~5× on phones; the fixed header spanned that width, parking the burger/toggle at ~1276px on a 360px screen. Same disease as bug #1, grid-track form. *Fix:* `minmax(0, 1fr)` on the mobile track.
+
+---
+
+# Reference
+
+## AI & search discoverability (feedback 2026-07-06)
+
+The site should be findable and summarisable by search engines *and* LLM crawlers — the goal is appearing when someone asks an assistant for photographers / digital marketers in Cape Town. Welcome crawlers; block nothing that reads politely. What we prevent is abuse, not access (Cloudflare's free unmetered DDoS protection + the WAF rate-limit at cutover).
+
+Implemented: robots.txt (allow all, disallow /admin + /api, sitemap reference), /llms.txt business summary (de-PII'd; becomes dynamic with item 13), JSON-LD ProfessionalService on the homepage, sitemap.xml. At cutover: AI Crawl Control → ALLOW (step 6), search registration (step 8).
 
 ## Non-goals (v1)
 
-Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid is curated via admin instead).
+Blog, e-commerce, live Instagram API (deprecated by Meta; the gallery is curated via admin instead), whole-section admin management (deferred by decision), Workers AI chat (item 13 maybe-later).
 
 ## Phases
 
-1. **Scaffold** — Astro + Wrangler + GH Action deploying to a preview URL. *Verify: preview serves hello-world.*
-2. **Public site** — rebuild the one-pager mirroring the dark/teal styling; migrate images. *Verify: side-by-side with live site, Lighthouse ≥ 90.*
-3. **Working form** — Turnstile + Resend + D1. *Verify: test submission lands in inbox and D1.*
-4. **Admin panel** — Cloudflare Access, content editing, gallery upload, enquiry list. *Verify: edit copy, see it live in seconds.*
-5. **Cutover** — point the domain at the Worker, retire the export. *Verify: SEO tags, privacy policy, social links intact.*
+1. ✅ **Scaffold** — Astro + Wrangler deploying to a preview URL.
+2. ✅ **Public site** — the one-pager, dark/teal, images migrated.
+3. ✅ **Working form** — Turnstile + Email Sending + D1.
+4. ✅ **Admin panel** — Cloudflare Access, content editing, gallery upload, enquiry list.
+5. ⏳ **Cutover** — see the runbook above.
 
-## Pending external tasks
-
-- GH repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (before first CI deploy). *The workflow shipped and was validated 2026-07-08 (`.github/workflows/ci.yml`; branch pushed, run #3 fully green, deploy job correctly skipped off-main): test job runs both suites — vitest API tests, then migrations + seed into local D1/R2 and the Playwright matrix with screenshot artifacts — no cloud credentials needed; deploy job runs on `main` only, gated on tests, and needs just these two secrets at cutover.*
-- ~~Turnstile~~ Done 2026-07-05: real widget live, secret on Worker, enforcement verified.
-- Email Sending: onboard `discoverwithleigh.co.za` — dashboard (Email Service → Email Sending → Onboard Domain) or add the zone-level Email permission to the API token. Leigh's destination address registered 2026-07-05; awaiting verification click.
-- Preview URL: https://discoverwithleigh.admin-discoverwithleigh.workers.dev (live domain untouched until cutover).
+Preview: https://preview.discoverwithleigh.co.za (custom domain; workers.dev disabled; live apex untouched until cutover).
