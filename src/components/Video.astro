@@ -127,7 +127,9 @@ const slides = [...video.tiktokIds.slice(start), ...video.tiktokIds.slice(0, sta
   }
   @media (max-width: 900px) {
     .video-grid {
-      grid-template-columns: 1fr;
+      /* minmax(0,…) so the TikTok slides' intrinsic width (5 × 325px) can't
+         inflate the track's automatic minimum and widen the page (bug #5) */
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

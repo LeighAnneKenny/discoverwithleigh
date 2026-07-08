@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.18.2",
+    "@playwright/test": "^1.61.1",
     "vitest": "^4.1.10"
   },
   "allowScripts": {
