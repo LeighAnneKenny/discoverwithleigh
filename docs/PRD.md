@@ -119,7 +119,7 @@ Blog, e-commerce, live Instagram API (deprecated by Meta; the "recent work" grid
 
 ## Pending external tasks
 
-- GH repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (before first CI deploy).
+- GH repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` (before first CI deploy). *The workflow itself shipped 2026-07-08 (`.github/workflows/ci.yml`, dormant until the repo is pushed): test job runs both suites — vitest API tests, then migrations + seed into local D1/R2 and the Playwright matrix with screenshot artifacts — no cloud credentials needed; deploy job runs on `main` only, gated on tests, and needs just these two secrets at cutover.*
 - ~~Turnstile~~ Done 2026-07-05: real widget live, secret on Worker, enforcement verified.
 - Email Sending: onboard `discoverwithleigh.co.za` — dashboard (Email Service → Email Sending → Onboard Domain) or add the zone-level Email permission to the API token. Leigh's destination address registered 2026-07-05; awaiting verification click.
 - Preview URL: https://discoverwithleigh.admin-discoverwithleigh.workers.dev (live domain untouched until cutover).
