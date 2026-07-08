@@ -28,6 +28,9 @@ jobs:
             npx wrangler d1 execute discoverwithleigh --local --file "$f"
           done
           node scripts/seed.ts
+          # contact PII is blanked in source (PRD item 9); give CI dummy values
+          # so rendering paths (FAB href, footer mailto, JSON-LD) are exercised
+          npx wrangler d1 execute discoverwithleigh --local --command "UPDATE content SET value = json_set(value, '\$.phone', '+1 555 010 0000', '\$.phoneHref', 'tel:+15550100000', '\$.email', 'ci@example.invalid') WHERE key = 'contact'"
       - run: npx playwright test
       - uses: actions/upload-artifact@v4
         if: always()
