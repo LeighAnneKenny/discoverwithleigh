@@ -13,7 +13,8 @@ const galaxy = {
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
-  reporter: [['list']],
+  // the github reporter surfaces failures as public PR/commit annotations
+  reporter: process.env.CI ? [['github'], ['list']] : [['list']],
   use: {
     baseURL: 'http://127.0.0.1:8788',
   },
