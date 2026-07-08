@@ -105,6 +105,20 @@ The v1 admin edits existing values only. Wanted next: add/remove items in list c
     - **Enquiry funnel without new tracking:** successful submissions = `enquiries` rows per day (already stored); form errors counted server-side in the existing `/api/contact` handler (Turnstile/validation rejections). Starts vs errors vs submissions = abandonment and friction. Explicit decision 2026-07-09: client-side "submit clicked" tracking is redundant and excluded.
     - Build after cutover (needs the Web Analytics beacon live on the apex).
 
+12. **Launch polish: share cards, redirects, a11y, Lighthouse.** (Added 2026-07-09; buildable pre-cutover.)
+    - **`og:image` + `twitter:card` + `apple-touch-icon`** — shared links (WhatsApp/DMs — the word-of-mouth channel) currently render bare cards; one branded image makes every share a mini-advert.
+    - **Legacy URL redirects + custom 404** — old WordPress URLs (`?p=`, `privacy-policy.html`, `index.html`) 301 to the right places at cutover; a branded 404 for everything else. Completes the SEO-continuity success criterion.
+    - **Accessibility test** — `@axe-core/playwright` scan added to the UI suite across all six profiles.
+    - **Lighthouse ≥ 90 verification** — the PRD's first success criterion, never formally measured; verify pre-cutover and record scores.
+    - *(No code — folded into the cutover runbook: Google Search Console + Bing Webmaster registration and sitemap submission (ChatGPT's web search uses Bing's index), Google Business Profile linked to the site + a client Google-review habit, DMARC check at email onboarding. Deliberate DON'T: no self-serving Review/aggregateRating schema on own testimonials — against Google guidelines.)*
+
+13. **Pre-baked Q&A (rates etc.) — admin-configurable, discreetly served.** (Added 2026-07-09; workshopped same day, decisions final.) Leigh's rates are deliberately absent from the page — but that forces contact for questions a canned answer could settle. Design:
+    - **Content:** a `qa` content section in D1 — question / answer / `show` / `public` per item — edited with the existing admin v2 list machinery.
+    - **Exposure — split by sensitivity (decision):** items marked `public: false` (rates) exist *only* in the on-site widget; items marked `public: true` (turnaround, travel radius, process) are additionally published to a crawlable endpoint (llms.txt becomes a dynamic route rendering them) so external LLMs can answer them. Principle acknowledged: LLMs can only answer what is publicly readable — rates stay in Leigh's control.
+    - **Interaction — question chips (decision):** tappable pre-set questions revealing canned answers, ending in a WhatsApp/contact CTA. Zero inference cost, zero hallucination risk, no chatbot theatre. Workers AI free-text matching is an explicit *maybe-later*, only after the content settles — and rate answers would still be served verbatim, never model-paraphrased.
+    - **Placement — "Questions?" pill above the WhatsApp FAB (decision):** compact panel, available throughout the scroll, before contact is initiated; styled to the site's type system, reduced-motion aware.
+    - Build post-cutover alongside items 11; Playwright coverage (pill placement, panel open/close, chips render from D1) added with the feature.
+
 ## AI & search discoverability (feedback, 2026-07-06)
 
 The site should be findable and summarisable by search engines *and* LLM crawlers — the goal is appearing when someone asks an assistant for photographers / digital marketers in Cape Town. Welcome crawlers; block nothing that reads politely. What we prevent is abuse, not access: no full-site scraping abuse or DDoS (Cloudflare's free unmetered DDoS protection covers the latter; add a WAF rate-limiting rule at cutover).
