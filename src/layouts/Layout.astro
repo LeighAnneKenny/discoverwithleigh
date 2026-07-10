@@ -73,7 +73,9 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
 
     <footer class="site-footer always-dark">
       <div class="wrap footer-inner">
-        <img src="/img/logo-lockup-480.webp" srcset="/img/logo-lockup-480.webp 480w, /img/logo-lockup-720.webp 720w" sizes="14rem" alt="Discover With Leigh" width="720" height="238" class="signature-lockup" loading="lazy" decoding="async" />
+        <a class="signature-link" href="/#top" aria-label="Discover With Leigh — back to top">
+          <img src="/img/logo-lockup-480.webp" srcset="/img/logo-lockup-480.webp 480w, /img/logo-lockup-720.webp 720w" sizes="14rem" alt="Discover With Leigh" width="720" height="238" class="signature-lockup" loading="lazy" decoding="async" />
+        </a>
         <div class="footer-legal">
           <p><a href="/privacy-policy">Privacy Policy</a></p>
           <p>&copy; {new Date().getFullYear()} Discover With Leigh. All rights reserved.</p>
@@ -260,6 +262,10 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
         width: clamp(11rem, 22vw, 14rem);
         height: auto;
         opacity: 0.9;
+        transition: opacity 0.2s;
+      }
+      .signature-link:hover :global(.signature-lockup) {
+        opacity: 1;
       }
       .footer-legal {
         text-align: right;

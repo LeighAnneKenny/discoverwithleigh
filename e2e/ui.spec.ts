@@ -86,6 +86,16 @@ test('logo returns home from another page', async ({ page }) => {
   expect(new URL(page.url()).pathname).toBe('/');
 });
 
+test('footer logo returns to the top', async ({ page }) => {
+  await page.goto('/');
+  const link = page.locator('.signature-link');
+  await link.scrollIntoViewIfNeeded();
+  expect(await page.evaluate(() => scrollY), 'started scrolled down').toBeGreaterThan(500);
+  await link.click();
+  await page.waitForURL('**/#top');
+  await expect.poll(() => page.evaluate(() => scrollY), { message: 'back at the top' }).toBeLessThan(80);
+});
+
 test('WhatsApp FAB: anchored bottom-right, tappable, correct link', async ({ page }) => {
   await page.goto('/');
   const fab = page.locator('.wa-fab');
