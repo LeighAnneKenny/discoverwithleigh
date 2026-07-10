@@ -41,7 +41,7 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 | # | Use case | Success criteria |
 |---|---|---|
-| 1 | Visitor browses portfolio on mobile | Lighthouse ≥ 90 all categories; LCP < 2.5s *(formal verification = item 12)* |
+| 1 | Visitor browses portfolio on mobile | Lighthouse ≥ 90 all categories ✅ *(2026-07-10, preview, mobile: perf 92 · a11y 100 · best-practices 100 · SEO 100 · agentic-browsing 100)*; LCP < 2.5s ⚠ 3.0s under Lighthouse's simulated slow-4G (CLS 0.001, TBT 0ms) — real-user LCP to be confirmed from Web Analytics RUM after cutover |
 | 2 | Visitor filters gallery by category | Instant client-side filtering, six categories preserved ✅ |
 | 3 | Visitor sends an enquiry | Stored in D1, email via Cloudflare Email Sending lands in Leigh's inbox, Turnstile blocks bots ✅ (email pending domain onboarding at cutover) |
 | 4 | Visitor taps WhatsApp / social CTAs | All existing links preserved ✅ |
@@ -49,7 +49,7 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 | 6 | Admin manages gallery | Upload to R2 with category + ordering ✅ |
 | 7 | Admin reviews enquiries | Submissions list in admin panel ✅ |
 | 8 | Developer deploys | Push to main → tests → live in < 5 min; rollback = `git revert` (pipeline validated; opens at cutover) |
-| 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept (redirects = item 12) |
+| 9 | SEO continuity | Same domain, meta/OG tags, sitemap, `/privacy-policy` kept ✅ *(legacy redirects + branded 404 shipped in item 12; final parity check at cutover)* |
 
 ---
 
