@@ -53,9 +53,20 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 ---
 
-# NEXT: pre-cutover work
+# NEXT: buildable during the review pause
 
-*(empty — all pre-cutover code is shipped; the cutover runbook below unblocks on Leigh's review)*
+*(Both were labelled "post-cutover" but neither actually depends on cutover — except item 11's traffic panel, noted inline. Building them now means Leigh reviews them on preview in the same pass as everything else.)*
+
+13. **Pre-baked Q&A (rates etc.) — admin-configurable, discreetly served.** (Added and workshopped 2026-07-09; decisions final. No cutover dependency.) Leigh's rates are deliberately absent from the page — but that forces contact for questions a canned answer could settle.
+    - **Content:** a `qa` content section in D1 — question / answer / `show` / `public` per item — edited with the existing admin v2 list machinery.
+    - **Exposure — split by sensitivity (decision):** `public: false` items (rates) exist *only* in the on-site widget; `public: true` items (turnaround, travel radius, process) are additionally published to a crawlable endpoint (llms.txt becomes a dynamic route rendering them) so external LLMs can answer them. Principle: LLMs can only answer what is publicly readable — rates stay in Leigh's control.
+    - **Interaction — question chips (decision):** tappable pre-set questions revealing canned answers, ending in a WhatsApp/contact CTA. Zero inference cost, zero hallucination risk, no chatbot theatre. Workers AI free-text matching is an explicit *maybe-later* — and rate answers would still be served verbatim, never model-paraphrased.
+    - **Placement — "Questions?" pill above the WhatsApp FAB (decision):** compact panel, available throughout the scroll; styled to the site's type system, reduced-motion aware. Playwright coverage added with the feature.
+
+11. **Site insights in admin.** (Added 2026-07-09.) A "live snapshot of how the site is being used" — an Insights tab in the existing admin: a few headline numbers and simple inline-SVG graphs, 7-day view by default with a 30-day toggle, nothing older. Constraints: lean, free, useful, performant. Two data sources, split by who already has the data:
+    - **Behaviour (buildable now — what Cloudflare can't see, in D1, bounded):** one `metrics(day, metric, count)` table with upsert-increment; ~15 metrics × 35 days ≈ 500 rows hard ceiling, self-pruned on write. Collected via a single batched `navigator.sendBeacon` per visit on pagehide (flags set by the existing reveal IntersectionObserver + click handlers — no libraries, no cookies, no identifiers, POPIA-clean). Metrics: section-reach funnel, WhatsApp FAB taps, contact form starts (first focus), gallery filter usage per category, social icon clicks per platform.
+    - **Enquiry funnel (buildable now, no new tracking):** successful submissions = `enquiries` rows per day (already stored); form errors counted server-side in the existing `/api/contact` handler. Starts vs errors vs submissions = abandonment and friction. *Decision 2026-07-09: client-side "submit clicked" tracking is redundant and excluded.*
+    - **Traffic (⏳ gated on cutover step 7 — Cloudflare's data, zero storage ours):** visits, page views, top referrers, top countries — pulled server-side from the free GraphQL Analytics API (RUM datasets, fed by the Web Analytics beacon) using a read-scoped token stored as a Worker secret. Panel ships stubbed "awaiting launch data" until the beacon is live. *Verify at build: RUM dataset retention on the free plan covers 30 days.*
 
 # WAITING ON LEIGH
 
@@ -85,18 +96,10 @@ In rough order:
 
 **Post-cutover verifications:** SEO parity (meta/OG, sitemap, `/privacy-policy`), contact form email lands in Leigh's inbox from the live domain, Playwright suite run against production.
 
-# POST-CUTOVER features
+# POST-CUTOVER
 
-11. **Site insights in admin.** (Added 2026-07-09; needs the Web Analytics beacon live.) A "live snapshot of how the site is being used" — an Insights tab in the existing admin: a few headline numbers and simple inline-SVG graphs, 7-day view by default with a 30-day toggle, nothing older. Constraints: lean, free, useful, performant. Two data sources, split by who already has the data:
-    - **Traffic (Cloudflare's data, zero storage ours):** visits, page views, top referrers, top countries — pulled server-side from the free GraphQL Analytics API (RUM datasets) using a read-scoped token stored as a Worker secret. *Verify at build: RUM dataset retention on the free plan covers 30 days.*
-    - **Behaviour (what Cloudflare can't see, in D1, bounded):** one `metrics(day, metric, count)` table with upsert-increment; ~15 metrics × 35 days ≈ 500 rows hard ceiling, self-pruned on write. Collected via a single batched `navigator.sendBeacon` per visit on pagehide (flags set by the existing reveal IntersectionObserver + click handlers — no libraries, no cookies, no identifiers, POPIA-clean). Metrics: section-reach funnel, WhatsApp FAB taps, contact form starts (first focus), gallery filter usage per category, social icon clicks per platform.
-    - **Enquiry funnel without new tracking:** successful submissions = `enquiries` rows per day (already stored); form errors counted server-side in the existing `/api/contact` handler. Starts vs errors vs submissions = abandonment and friction. *Decision 2026-07-09: client-side "submit clicked" tracking is redundant and excluded.*
-
-13. **Pre-baked Q&A (rates etc.) — admin-configurable, discreetly served.** (Added and workshopped 2026-07-09; decisions final.) Leigh's rates are deliberately absent from the page — but that forces contact for questions a canned answer could settle.
-    - **Content:** a `qa` content section in D1 — question / answer / `show` / `public` per item — edited with the existing admin v2 list machinery.
-    - **Exposure — split by sensitivity (decision):** `public: false` items (rates) exist *only* in the on-site widget; `public: true` items (turnaround, travel radius, process) are additionally published to a crawlable endpoint (llms.txt becomes a dynamic route rendering them) so external LLMs can answer them. Principle: LLMs can only answer what is publicly readable — rates stay in Leigh's control.
-    - **Interaction — question chips (decision):** tappable pre-set questions revealing canned answers, ending in a WhatsApp/contact CTA. Zero inference cost, zero hallucination risk, no chatbot theatre. Workers AI free-text matching is an explicit *maybe-later* — and rate answers would still be served verbatim, never model-paraphrased.
-    - **Placement — "Questions?" pill above the WhatsApp FAB (decision):** compact panel, available throughout the scroll; styled to the site's type system, reduced-motion aware. Playwright coverage added with the feature.
+- **Item 11's traffic panel** — un-stub once the Web Analytics beacon (cutover step 7) has data and the read-scoped GraphQL token is in place.
+- **Real-user LCP check** — success criterion 1's 2.5s target vs the 3.0s simulated figure, from Web Analytics RUM.
 
 ---
 
