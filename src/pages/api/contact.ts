@@ -26,6 +26,11 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const email = field('email');
   const message = field('message');
   if (!outcome.success || !firstName || !lastName || !email || !message) {
+    // friction counter for the admin insights funnel (best-effort; bots that
+    // filled the honeypot never reach here so they don't pollute it)
+    await env.DB.prepare(
+      "INSERT INTO metrics (day, metric, count) VALUES (date('now'), 'contact_error', 1) ON CONFLICT(day, metric) DO UPDATE SET count = count + 1",
+    ).run().catch(() => {});
     return redirect('/?error=1#contact', 303);
   }
 

@@ -22,6 +22,7 @@ export const prerender = false;
         <button data-tab="gallery">Gallery</button>
         <button data-tab="brands">Brands</button>
         <button data-tab="enquiries">Enquiries</button>
+        <button data-tab="insights">Insights</button>
       </nav>
     </header>
 
@@ -37,6 +38,7 @@ export const prerender = false;
         <div class="grid grid-small" id="brands-grid"></div>
       </section>
       <section id="tab-enquiries" hidden></section>
+      <section id="tab-insights" hidden></section>
     </main>
 
     <script>
@@ -63,7 +65,7 @@ export const prerender = false;
       document.querySelectorAll<HTMLButtonElement>('#tabs button').forEach((b) =>
         b.addEventListener('click', () => {
           document.querySelectorAll('#tabs button').forEach((x) => x.classList.toggle('is-active', x === b));
-          for (const name of ['content', 'gallery', 'brands', 'enquiries']) {
+          for (const name of ['content', 'gallery', 'brands', 'enquiries', 'insights']) {
             $(`#tab-${name}`).hidden = name !== b.dataset.tab;
           }
         }),
@@ -364,6 +366,105 @@ export const prerender = false;
         table.appendChild(tbody);
         enqTab.appendChild(table);
       }
+
+      // ---- insights (PRD item 11) ----
+      // Behaviour counters from the bounded D1 metrics table + the enquiry
+      // funnel. Traffic (referrers/countries) arrives with Web Analytics at
+      // launch — stubbed until then.
+      const insTab = $('#tab-insights');
+      const SECTION_ORDER = ['about', 'photography', 'video', 'marketing', 'influencer', 'reviews', 'brands', 'contact'];
+
+      function dayKeys(days: number) {
+        return Array.from({ length: days }, (_, i) => new Date(Date.now() - (days - 1 - i) * 864e5).toISOString().slice(0, 10));
+      }
+
+      // Column chart per day: teal marks, 4px rounded data-end (baseline kept
+      // square by clipping a 4px overshoot), 2px surface gaps, native tooltips.
+      function sparkbars(byDay: Map<string, number>, days: string[], id: string) {
+        const max = Math.max(1, ...days.map((k) => byDay.get(k) ?? 0));
+        const bw = days.length > 10 ? 10 : 22;
+        const h = 56;
+        const w = days.length * (bw + 2) - 2;
+        const bars = days
+          .map((k, i) => {
+            const v = byDay.get(k) ?? 0;
+            const bh = v ? Math.max(3, Math.round((v / max) * h)) : 1;
+            return `<rect x="${i * (bw + 2)}" y="${h - bh}" width="${bw}" height="${bh + 4}" rx="4" fill="${v ? 'var(--teal)' : 'var(--line)'}"><title>${k}: ${v}</title></rect>`;
+          })
+          .join('');
+        return `<svg viewBox="0 0 ${w} ${h}" class="spark" role="img" aria-label="per-day counts">
+          <clipPath id="clip-${id}"><rect width="${w}" height="${h}" /></clipPath>
+          <g clip-path="url(#clip-${id})">${bars}</g></svg>`;
+      }
+
+      function renderInsights(data: any) {
+        const days = dayKeys(data.days);
+        const m: Record<string, { total: number; byDay: Map<string, number> }> = {};
+        for (const r of data.metrics) {
+          m[r.metric] ??= { total: 0, byDay: new Map() };
+          m[r.metric].total += r.count;
+          m[r.metric].byDay.set(r.day, r.count);
+        }
+        const enqByDay = new Map<string, number>(data.enquiries.map((r: any) => [r.day, r.count]));
+        const enqTotal = data.enquiries.reduce((a: number, r: any) => a + r.count, 0);
+        const total = (k: string) => m[k]?.total ?? 0;
+        const visits = total('visit');
+
+        const tiles = [
+          ['Visits', visits],
+          ['Enquiries', enqTotal],
+          ['WhatsApp taps', total('fab')],
+          ['Form starts', total('form_start')],
+          ['Form errors', total('contact_error')],
+          ['Q&A opens', total('qa_open')],
+        ]
+          .map(([label, v]) => `<div class="tile"><small>${label}</small><b>${v}</b></div>`)
+          .join('');
+
+        const funnel = SECTION_ORDER.map((s) => {
+          const v = total('section:' + s);
+          const pct = visits ? Math.round((v / visits) * 100) : 0;
+          return `<div class="frow"><small>${s}</small><div class="ftrack"><div class="ffill" style="width:${Math.min(100, pct)}%"></div></div><span>${pct}%</span></div>`;
+        }).join('');
+
+        const list = (prefix: string) =>
+          Object.entries(m)
+            .filter(([k]) => k.startsWith(prefix))
+            .sort((a, b) => b[1].total - a[1].total)
+            .map(([k, v]) => `<li>${k.slice(prefix.length)} <b>${v.total}</b></li>`)
+            .join('') || '<li class="empty">nothing yet</li>';
+
+        insTab.innerHTML = `
+          <div class="ins-head">
+            <h2>Last ${data.days} days</h2>
+            <div class="range">
+              <button data-days="7" class="${data.days === 7 ? 'is-active' : ''}">7d</button>
+              <button data-days="30" class="${data.days === 30 ? 'is-active' : ''}">30d</button>
+            </div>
+          </div>
+          <div class="tiles">${tiles}</div>
+          <div class="charts">
+            <figure><figcaption>Visits per day</figcaption>${sparkbars(m['visit']?.byDay ?? new Map(), days, 'v')}</figure>
+            <figure><figcaption>Enquiries per day</figcaption>${sparkbars(enqByDay, days, 'e')}</figure>
+          </div>
+          <div class="cols">
+            <div><h3>How far people scroll</h3>${funnel}</div>
+            <div>
+              <h3>Gallery filters used</h3><ul class="counts">${list('filter:')}</ul>
+              <h3>Social clicks</h3><ul class="counts">${list('social:')}</ul>
+            </div>
+          </div>
+          <p class="stub">Traffic — page views, referrers, countries — arrives with Cloudflare Web Analytics at launch.</p>`;
+
+        insTab.querySelectorAll<HTMLButtonElement>('.range button').forEach((b) =>
+          b.addEventListener('click', () => loadInsights(Number(b.dataset.days))),
+        );
+      }
+
+      async function loadInsights(days: number) {
+        renderInsights(await api(`/api/admin/insights?days=${days}`));
+      }
+      loadInsights(7);
     </script>
 
     <style is:global>
@@ -521,6 +622,61 @@ export const prerender = false;
         color: var(--teal);
       }
       .empty { color: var(--mist); }
+
+      /* ---- insights ---- */
+      .ins-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+      .ins-head h2 { font-size: 1.05rem; }
+      .range button {
+        font: 600 0.7rem var(--font-label);
+        letter-spacing: 0.12em;
+        color: var(--mist);
+        background: none;
+        border: 1px solid var(--line);
+        padding: 0.35rem 0.8rem;
+        cursor: pointer;
+      }
+      .range button.is-active { color: var(--teal); border-color: var(--teal); }
+      .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.7rem; margin-block: 1.1rem; }
+      .tile { border: 1px solid var(--line); padding: 0.75rem 0.9rem; }
+      .tile small {
+        font-family: var(--font-label);
+        font-size: 0.62rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mist);
+      }
+      .tile b { display: block; font-size: 1.7rem; font-weight: 600; margin-top: 0.2rem; }
+      .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.2rem; margin-block: 1.2rem; }
+      .charts figure { border: 1px solid var(--line); padding: 0.9rem; }
+      .charts figcaption {
+        font-family: var(--font-label);
+        font-size: 0.66rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mist);
+        margin-bottom: 0.7rem;
+      }
+      .spark { width: 100%; max-width: 30rem; height: auto; display: block; }
+      .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.2rem; margin-block: 1.2rem; }
+      .cols h3 {
+        font-family: var(--font-label);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-block: 0.8rem 0.6rem;
+      }
+      .frow { display: grid; grid-template-columns: 6.5rem 1fr 2.6rem; align-items: center; gap: 0.6rem; margin-block: 0.35rem; }
+      .frow small { color: var(--mist); font-size: 0.78rem; text-transform: capitalize; }
+      .frow span { font-size: 0.78rem; text-align: right; }
+      .ftrack { height: 8px; background: color-mix(in srgb, var(--teal) 16%, transparent); border-radius: 4px; overflow: hidden; }
+      .ffill { height: 100%; background: var(--teal); border-radius: 4px 0 0 4px; }
+      .counts { list-style: none; padding: 0; }
+      .counts li { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; text-transform: capitalize; }
+      .stub { color: var(--mist); border: 1px dashed var(--line); padding: 0.9rem 1rem; font-size: 0.85rem; }
     </style>
   </body>
 </html>

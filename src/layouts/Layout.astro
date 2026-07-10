@@ -122,6 +122,35 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
         { rootMargin: '0px 0px -8% 0px' },
       );
       document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+      // behaviour beacon (PRD item 11): flags accumulate during the visit and
+      // leave once, on first hide. No cookies, no identifiers — counters only.
+      const hits = new Set(['visit']);
+      const secIO = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            hits.add('section:' + e.target.id);
+            secIO.unobserve(e.target);
+          }
+        }
+      });
+      document.querySelectorAll('main section[id]').forEach((el) => secIO.observe(el));
+      document.querySelector('.wa-fab')?.addEventListener('click', () => hits.add('fab'));
+      document.querySelector('.contact-form')?.addEventListener('focusin', () => hits.add('form_start'), { once: true });
+      document.querySelectorAll<HTMLElement>('.tab[data-filter]').forEach((t) =>
+        t.addEventListener('click', () => hits.add('filter:' + t.dataset.filter)),
+      );
+      document.querySelectorAll<HTMLElement>('.contact-socials a').forEach((a) =>
+        a.addEventListener('click', () => hits.add('social:' + (a.getAttribute('aria-label') ?? '').toLowerCase())),
+      );
+      document.getElementById('qa-pill')?.addEventListener('click', () => hits.add('qa_open'), { once: true });
+      let beaconSent = false;
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden' && !beaconSent) {
+          beaconSent = true;
+          navigator.sendBeacon('/api/metrics', new Blob([JSON.stringify([...hits])], { type: 'application/json' }));
+        }
+      });
     </script>
 
     <style>

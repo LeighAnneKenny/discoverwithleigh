@@ -46,11 +46,14 @@ describe('POST /api/contact', () => {
     expect(await enquiryCount()).toBe(0);
   });
 
-  it('rejects when Turnstile fails, storing nothing', async () => {
+  it('rejects when Turnstile fails, storing nothing (and counts the friction)', async () => {
     mockTurnstile(false);
     const res = await submit(valid);
     expect(res.headers.get('Location')).toBe('/?error=1#contact');
     expect(await enquiryCount()).toBe(0);
+    // server-side error counter feeds the insights funnel (PRD item 11)
+    const err = await env.DB.prepare("SELECT count FROM metrics WHERE metric = 'contact_error'").first<{ count: number }>();
+    expect(err?.count).toBeGreaterThanOrEqual(1);
   });
 
   it('rejects when required fields are missing, even with Turnstile passing', async () => {
