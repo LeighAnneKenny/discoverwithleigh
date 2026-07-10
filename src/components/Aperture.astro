@@ -3,13 +3,28 @@
 // centre. Geometry frozen from the signed-off parameters (2026-07-06):
 // N=6 blades, R=48 disc, r0=17 opening, swirl=50°, gap=2° — regenerate with
 // the same maths if the mark is ever retuned.
+//
+// Animation contract (PRD item 14 — real iris mechanics, per Leigh's Sigma
+// lens reference): each blade rotates about its pivot on the rim, so the
+// blade lines sweep INWARD as the hole closes. The clipPath at r=48 is the
+// housing — the outer edge can never move. Blades carry extra material out
+// to r=75 (rim arc replaced by tangent-line → arc → tangent-line; everything
+// inside r≤48 is verbatim frozen geometry) so the material swinging in under
+// rotation covers what rotation vacates. Regenerate the extensions from the
+// frozen paths with e2e-artifacts/aperture-extend.mjs if the mark is retuned.
 const { class: className } = Astro.props;
+// clipPath ids must be unique per instance (the mark appears many times per
+// page, and duplicate ids would trip the axe a11y scan)
+const uid = Math.random().toString(36).slice(2, 8);
 ---
 <svg class={className} viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
-  <path class="blade" d="M 97.97 51.68 A 48 48 0 0 1 75.44 90.71 Q 56.01 85.90 44.75 66.17 A 17 17 0 0 0 60.47 63.40 Q 83.12 65.09 97.97 51.68 Z" style="transform-origin: 97.97px 51.68px" />
-  <path class="blade" d="M 72.53 92.38 A 48 48 0 0 1 27.47 92.38 Q 21.91 73.15 33.37 53.53 A 17 17 0 0 0 43.63 65.76 Q 53.49 86.23 72.53 92.38 Z" style="transform-origin: 72.53px 92.38px" />
-  <path class="blade" d="M 24.56 90.71 A 48 48 0 0 1 2.03 51.68 Q 15.91 37.25 38.62 37.37 A 17 17 0 0 0 33.17 52.37 Q 20.37 71.14 24.56 90.71 Z" style="transform-origin: 24.56px 90.71px" />
-  <path class="blade" d="M 2.03 48.32 A 48 48 0 0 1 24.56 9.29 Q 43.99 14.10 55.25 33.83 A 17 17 0 0 0 39.53 36.60 Q 16.88 34.91 2.03 48.32 Z" style="transform-origin: 2.03px 48.32px" />
-  <path class="blade" d="M 27.47 7.62 A 48 48 0 0 1 72.53 7.62 Q 78.09 26.85 66.63 46.47 A 17 17 0 0 0 56.37 34.24 Q 46.51 13.77 27.47 7.62 Z" style="transform-origin: 27.47px 7.62px" />
-  <path class="blade" d="M 75.44 9.29 A 48 48 0 0 1 97.97 48.32 Q 84.09 62.75 61.38 62.63 A 17 17 0 0 0 66.83 47.63 Q 79.63 28.86 75.44 9.29 Z" style="transform-origin: 75.44px 9.29px" />
+  <clipPath id={`ap-${uid}`}><circle cx="50" cy="50" r="48" /></clipPath>
+  <g class="iris" clip-path={`url(#ap-${uid})`}>
+    <path class="blade" d="M 122.22 29.78 A 75 75 0 0 1 107.16 98.56 L 75.44 90.71 Q 56.01 85.90 44.75 66.17 A 17 17 0 0 0 60.47 63.40 Q 83.12 65.09 97.97 51.68 L 122.22 29.78 Z" style="transform-origin: 97.97px 51.68px" />
+    <path class="blade" d="M 103.63 102.43 A 75 75 0 0 1 36.55 123.78 L 27.47 92.38 Q 21.91 73.15 33.37 53.53 A 17 17 0 0 0 43.63 65.76 Q 53.49 86.23 72.53 92.38 L 103.63 102.43 Z" style="transform-origin: 72.53px 92.38px" />
+    <path class="blade" d="M 31.40 122.66 A 75 75 0 0 1 -20.63 75.23 L 2.03 51.68 Q 15.91 37.25 38.62 37.37 A 17 17 0 0 0 33.17 52.37 Q 20.37 71.14 24.56 90.71 L 31.40 122.66 Z" style="transform-origin: 24.56px 90.71px" />
+    <path class="blade" d="M -22.22 70.22 A 75 75 0 0 1 -7.16 1.44 L 24.56 9.29 Q 43.99 14.10 55.25 33.83 A 17 17 0 0 0 39.53 36.60 Q 16.88 34.91 2.03 48.32 L -22.22 70.22 Z" style="transform-origin: 2.03px 48.32px" />
+    <path class="blade" d="M -3.63 -2.43 A 75 75 0 0 1 63.45 -23.78 L 72.53 7.62 Q 78.09 26.85 66.63 46.47 A 17 17 0 0 0 56.37 34.24 Q 46.51 13.77 27.47 7.62 L -3.63 -2.43 Z" style="transform-origin: 27.47px 7.62px" />
+    <path class="blade" d="M 68.60 -22.66 A 75 75 0 0 1 120.63 24.77 L 97.97 48.32 Q 84.09 62.75 61.38 62.63 A 17 17 0 0 0 66.83 47.63 Q 79.63 28.86 75.44 9.29 L 68.60 -22.66 Z" style="transform-origin: 75.44px 9.29px" />
+  </g>
 </svg>

@@ -77,26 +77,46 @@ const { hero } = Astro.props as { hero: SiteContent['hero'] };
     vertical-align: baseline;
     margin-inline: 0.02em;
   }
-  /* shutter click on load: open → snap closed (the capture) → reopen */
+  /* shutter click on load: open → snap closed (the capture) → reopen.
+     Real iris mechanics (PRD item 14): each blade rotates about its rim
+     pivot so the blade lines sweep inward as the hole closes; the clipPath
+     housing in Aperture.astro keeps the outer edge immovable. */
   .hero-title :global(.hero-aperture .blade) {
     transform-box: view-box;
+    /* the seam lines: each blade's edge drawn over the blade it overlaps, so
+       the lines stay visible (sharpening into the pinhole) instead of
+       vanishing when same-colour blades overlap. Invisible at rest. */
+    stroke: rgb(0 0 0 / 0.3);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    stroke-opacity: 0;
     animation: blade-click 1.7s 0.5s both;
   }
   @keyframes blade-click {
     0% {
       rotate: 0deg;
+      stroke-opacity: 0;
       animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
     }
+    15% {
+      stroke-opacity: 1;
+    }
+    /* 14°: stops down to a small pore with the seam lines converging into it
+       (like the reference photo) — more rotation makes the centre tangle */
     38% {
-      rotate: 24deg;
+      rotate: 14deg;
       animation-timing-function: linear;
     }
     50% {
-      rotate: 24deg;
+      rotate: 14deg;
       animation-timing-function: cubic-bezier(0.2, 0.6, 0.3, 1);
+    }
+    85% {
+      stroke-opacity: 1;
     }
     100% {
       rotate: 0deg;
+      stroke-opacity: 0;
     }
   }
   .hero-sub-line {

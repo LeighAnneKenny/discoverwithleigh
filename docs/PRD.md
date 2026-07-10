@@ -55,6 +55,14 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 # NEXT: pre-cutover work
 
+14. **Hero aperture animation rework — fixed outer ring.** (Leigh feedback 2026-07-09, first item of her review round.)
+    - **Problem:** the shutter-click animation rotates each blade about a pivot on the rim, so the outer arcs swing with the blades — the mark's outer edge deforms ("jaws closing") instead of reading as a camera iris stopping down.
+    - **Goal:** outer circle stays perfectly fixed (a real iris's housing never moves); only the central opening closes/reopens and the blade lines sweep — per the aperture-range reference (f2.8 → f22 → back).
+    - **Constraints:** rest-state mark stays pixel-identical to the signed-off frozen geometry; reduced-motion still disables it; approve on local dev before commit.
+    - **Round 2 (Leigh, 2026-07-09, ref: "Sigma Lens Aperture Blades Opening and Closing — Close Up"):** v2 (centre rotation + pupil ring) kept the rim fixed but made the blade lines retreat *outward* as the hole closed — a real iris's lines sweep *inward*. v3 restores v1's rim-pivot blade rotation (correct inward sweep), adds a clipPath at r=48 as the immovable housing, and extends each blade's material to r=75 outside the clip so rotation never uncovers the rim. Everything inside r≤48 is verbatim frozen geometry.
+    - **Round 3 (Leigh, 2026-07-09, iris close-up photo):** the lines must stay visible and sharpen into the pinhole, not vanish when same-colour blades overlap. v4 adds a per-blade edge stroke (translucent black hairline — the seam a stacked blade casts on the one beneath) that fades in during the click and out at rest, and drops rotation 24° → 14° so it stops down to a small pore with the seams converging into it instead of tangling past centre.
+    - Done when: Caveshen approves the motion on dev, Leigh approves on preview.
+
 12. **Launch polish: share cards, redirects, a11y, Lighthouse.** (Added 2026-07-09; buildable now.)
     - **`og:image` + `twitter:card` + `apple-touch-icon`** — shared links (WhatsApp/DMs — the word-of-mouth channel) currently render bare cards; one branded image makes every share a mini-advert.
     - **Legacy URL redirects + custom 404** — old WordPress URLs (`?p=`, `privacy-policy.html`, `index.html`) 301 to the right places; a branded 404 for everything else. Completes success criterion 9.
