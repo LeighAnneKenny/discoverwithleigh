@@ -1,7 +1,5 @@
 ---
-import { Image } from 'astro:assets';
 import Eyebrow from './Eyebrow.astro';
-import portrait from '../assets/about-leigh.jpg';
 import type { SiteContent } from '../lib/content';
 
 const { about, services } = Astro.props as { about: SiteContent['about']; services: SiteContent['services'] };
@@ -9,7 +7,16 @@ const { about, services } = Astro.props as { about: SiteContent['about']; servic
 <section class="section" id="about">
   <div class="wrap about-grid">
     <figure class="about-figure reveal">
-      <Image src={portrait} alt="Leigh-Anne Kenny, photographer, holding her camera" widths={[480, 760, 980]} sizes="(max-width: 900px) 92vw, 44vw" />
+      <img
+        src="/img/about-leigh-760.webp"
+        srcset="/img/about-leigh-480.webp 480w, /img/about-leigh-760.webp 760w, /img/about-leigh-980.webp 980w"
+        sizes="(max-width: 900px) 92vw, 44vw"
+        alt="Leigh-Anne Kenny, photographer, holding her camera"
+        width="980"
+        height="1307"
+        loading="lazy"
+        decoding="async"
+      />
     </figure>
     <div class="about-copy reveal">
       <Eyebrow>{about.eyebrow}</Eyebrow>

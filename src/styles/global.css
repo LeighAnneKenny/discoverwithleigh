@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: 'Vogue Sans';
-  src: url('/fonts/vogue-sans-medium.ttf') format('truetype');
+  src: url('/fonts/vogue-sans-medium.woff2') format('woff2'), url('/fonts/vogue-sans-medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
 }

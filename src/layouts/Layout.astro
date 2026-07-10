@@ -2,8 +2,6 @@
 import '@fontsource-variable/montserrat';
 import '@fontsource-variable/nunito-sans';
 import '../styles/global.css';
-import { Image } from 'astro:assets';
-import logoLockup from '../assets/logo-lockup.png';
 import { meta, nav } from '../data/site';
 import { loadContent } from '../lib/content';
 
@@ -21,6 +19,9 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <!-- the hero headline is the LCP element; without this the font arrives via
+         the CSS chain and its swap repaint becomes a ~10s LCP under throttling -->
+    <link rel="preload" href="/fonts/vogue-sans-medium.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={new URL(Astro.url.pathname, meta.url)} />
@@ -45,7 +46,7 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
     <header class="site-header always-dark" id="site-header">
       <div class="wrap header-inner">
         <a class="brand" href="/#top" aria-label="Discover With Leigh — home">
-          <Image src={logoLockup} alt="Discover With Leigh — marketing content creation" widths={[240, 480]} sizes="10rem" class="brand-lockup" />
+          <img src="/img/logo-lockup-480.webp" srcset="/img/logo-lockup-240.webp 240w, /img/logo-lockup-480.webp 480w" sizes="10rem" alt="Discover With Leigh — marketing content creation" width="480" height="159" class="brand-lockup" />
         </a>
         <div class="header-right">
           <nav class="site-nav" id="site-nav" aria-label="Main">
@@ -72,7 +73,7 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
 
     <footer class="site-footer always-dark">
       <div class="wrap footer-inner">
-        <Image src={logoLockup} alt="Discover With Leigh" widths={[360, 720]} sizes="14rem" class="signature-lockup" loading="lazy" />
+        <img src="/img/logo-lockup-480.webp" srcset="/img/logo-lockup-480.webp 480w, /img/logo-lockup-720.webp 720w" sizes="14rem" alt="Discover With Leigh" width="720" height="238" class="signature-lockup" loading="lazy" decoding="async" />
         <div class="footer-legal">
           <p><a href="/privacy-policy">Privacy Policy</a></p>
           <p>&copy; {new Date().getFullYear()} Discover With Leigh. All rights reserved.</p>

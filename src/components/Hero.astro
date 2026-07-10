@@ -1,17 +1,20 @@
 ---
-import { Image } from 'astro:assets';
 import Aperture from './Aperture.astro';
-import heroBg from '../assets/hero-bg.jpg';
 import type { SiteContent } from '../lib/content';
 
 const { hero } = Astro.props as { hero: SiteContent['hero'] };
 ---
 <section class="hero">
-  <Image
-    src={heroBg}
-    alt=""
-    widths={[820, 1400, 2200]}
+  {/* static pre-optimized variants (scripts/optimize-images.mjs) — the runtime
+      /_image endpoint is a passthrough on workerd, so astro:assets <Image>
+      shipped the 817KB original to every device */}
+  <img
+    src="/img/hero-bg-1400.webp"
+    srcset="/img/hero-bg-480.webp 480w, /img/hero-bg-820.webp 820w, /img/hero-bg-1400.webp 1400w, /img/hero-bg-2200.webp 2200w"
     sizes="100vw"
+    alt=""
+    width="2200"
+    height="1467"
     loading="eager"
     fetchpriority="high"
     class="hero-bg"

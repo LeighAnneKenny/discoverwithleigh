@@ -10,7 +10,7 @@ const { items } = Astro.props as { items: MediaItem[] };
     <h2 class="section-heading">Brands I’ve worked with</h2>
   </div>
   <div class="wrap reveal">
-    <div class="marquee" aria-label="Client brand logos">
+    <div class="marquee" role="group" aria-label="Client brand logos">
       <div class="marquee-track">
         {[0, 1].map((dup) => (
           <div class="marquee-half" aria-hidden={dup === 1 ? 'true' : undefined}>
