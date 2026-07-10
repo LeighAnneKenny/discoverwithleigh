@@ -167,6 +167,16 @@ test('Q&A widget: pill above FAB, chips reveal answers, CTAs correct', async ({ 
   const pill = page.locator('#qa-pill');
   const fab = page.locator('.wa-fab');
   await expect(pill).toBeVisible();
+
+  if (isMobile(page)) {
+    // starts minimised ("?" circle: label hidden); expands at the reviews
+    await expect(pill.locator('span')).toBeHidden();
+    await page.locator('#reviews').scrollIntoViewIfNeeded();
+    await expect(pill.locator('span')).toBeVisible();
+    await page.locator('#top').scrollIntoViewIfNeeded();
+  } else {
+    await expect(pill.locator('span'), 'desktop pill is never minimised').toBeVisible();
+  }
   const pillBox = (await pill.boundingBox())!;
   const fabBox = (await fab.boundingBox())!;
   expect(pillBox.y + pillBox.height, 'pill sits above the FAB').toBeLessThanOrEqual(fabBox.y);

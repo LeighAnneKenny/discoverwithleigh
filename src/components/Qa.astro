@@ -9,7 +9,7 @@ const items = qa.filter((i) => i.show);
 const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${encodeURIComponent(contact.whatsappMessage)}`;
 ---
 {items.length > 0 && (
-  <div class="qa" id="qa">
+  <div class="qa" id="qa" data-min>
     <div class="qa-panel" id="qa-panel" hidden>
       <header class="qa-head">
         <p class="qa-title">Quick answers</p>
@@ -28,7 +28,9 @@ const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${enc
         <a class="qa-contact" href="#contact">or use the contact form</a>
       </footer>
     </div>
-    <button class="qa-pill" id="qa-pill" aria-expanded="false" aria-controls="qa-panel">Questions?</button>
+    <button class="qa-pill" id="qa-pill" aria-expanded="false" aria-controls="qa-panel" aria-label="Questions?">
+      <span>Questions?</span>
+    </button>
   </div>
 )}
 
@@ -46,6 +48,23 @@ const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${enc
     addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !panel.hidden) setOpen(false);
     });
+
+    // Starts minimised (a "?" circle, mobile only per the CSS); expands to the
+    // labelled pill once the visitor reaches the reviews — the point where
+    // questions about rates/booking actually form.
+    const qa = document.getElementById('qa')!;
+    const reviews = document.getElementById('reviews');
+    if (reviews) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          qa.removeAttribute('data-min');
+          io.disconnect();
+        }
+      });
+      io.observe(reviews);
+    } else {
+      qa.removeAttribute('data-min');
+    }
   }
 </script>
 
@@ -80,6 +99,26 @@ const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${enc
   .qa-pill[aria-expanded='true'] {
     color: var(--teal-hi);
     border-color: var(--teal);
+  }
+  /* minimised form (mobile only): a quiet "?" circle matching the FAB column
+     until the visitor reaches the reviews — then the label appears */
+  @media (max-width: 760px) {
+    .qa[data-min] .qa-pill {
+      width: 2.7rem;
+      height: 2.7rem;
+      padding: 0;
+      display: grid;
+      place-items: center;
+    }
+    .qa[data-min] .qa-pill span {
+      display: none;
+    }
+    .qa[data-min] .qa-pill::before {
+      content: '?';
+      font-size: 1rem;
+      letter-spacing: 0;
+      color: var(--teal-hi);
+    }
   }
   .qa-panel[hidden] {
     display: none; /* author display:flex would otherwise defeat the hidden attribute */
