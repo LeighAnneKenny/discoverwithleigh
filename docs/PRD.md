@@ -61,7 +61,7 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 - **Site review** — the current pause; feedback may spawn one more work round.
 - **Item 14 verdict** — aperture shutter-click v4 (see SHIPPED) is live on preview awaiting her approval; the three feedback rounds are recorded there.
-- **Email destination verify click** — registered 2026-07-05; prerequisite for email onboarding at cutover.
+- ~~Email destination verify click~~ ✅ done all along — API shows `discoverwithleigh@gmail.com` verified 2026-07-05 22:05, eleven minutes after registration. Email onboarding at cutover is unblocked.
 - 📨 **Item 5 — WhatsApp auto-response.** (Added 2026-07-06; handed to Leigh 2026-07-07. No site code; configured in the WhatsApp Business app on the phone holding the business contact number, under Settings → Business tools.)
   - **Greeting message** — https://faq.whatsapp.com/501866148528310 — auto-replies to first-time enquirers (or after 14 days' silence); this answers the website FAB's pre-filled message. Set recipients to "Everyone". Draft copy: *"Hi! Thanks for reaching out to Discover With Leigh 📸 I've seen your message and I'll get back to you personally within a few hours — usually much sooner. To speed things along, tell me a bit about what you have in mind: the type of shoot or campaign, and any dates you're eyeing."*
   - **Away message** — https://faq.whatsapp.com/2565868990219715 — out-of-hours cover for repeat enquirers. The "outside business hours" schedule requires business hours set on the profile first. Draft copy: *"Thanks for your message! I'm out on a shoot right now 🎥 — I'll reply as soon as I'm back. If it's urgent, you can also email [the business email]."*
