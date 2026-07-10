@@ -29,7 +29,7 @@ const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${enc
       </footer>
     </div>
     <button class="qa-pill" id="qa-pill" aria-expanded="false" aria-controls="qa-panel" aria-label="Questions?">
-      <span>Questions?</span>
+      <span class="q-mini" aria-hidden="true">?</span><span class="q-full">Questions?</span>
     </button>
   </div>
 )}
@@ -100,24 +100,55 @@ const waHref = `https://wa.me/${contact.phoneHref.replace(/\D/g, '')}?text=${enc
     color: var(--teal-hi);
     border-color: var(--teal);
   }
+  /* the "?" is only ever shown in the minimised mobile state */
+  .q-mini {
+    display: none;
+  }
   /* minimised form (mobile only): a quiet "?" circle matching the FAB column
-     until the visitor reaches the reviews — then the label appears */
+     until the visitor reaches the reviews — then it unfurls into the label.
+     width:auto can't transition, so both spans crossfade via max-width. */
   @media (max-width: 760px) {
-    .qa[data-min] .qa-pill {
-      width: 2.7rem;
+    .qa .qa-pill {
       height: 2.7rem;
+      min-width: 2.7rem; /* keeps the minimised state circular without a fixed width (which couldn't transition to auto) */
       padding: 0;
-      display: grid;
-      place-items: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-    .qa[data-min] .qa-pill span {
-      display: none;
+    .qa .qa-pill .q-mini,
+    .qa .qa-pill .q-full {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: max-width 0.35s ease, opacity 0.3s ease;
     }
-    .qa[data-min] .qa-pill::before {
-      content: '?';
+    .qa .qa-pill .q-mini {
       font-size: 1rem;
       letter-spacing: 0;
       color: var(--teal-hi);
+      max-width: 0;
+      opacity: 0;
+    }
+    .qa .qa-pill .q-full {
+      max-width: 12rem;
+      opacity: 1;
+      padding-inline: 1.05rem;
+    }
+    .qa[data-min] .qa-pill .q-mini {
+      max-width: 1.2rem;
+      opacity: 1;
+    }
+    .qa[data-min] .qa-pill .q-full {
+      max-width: 0;
+      opacity: 0;
+      padding-inline: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qa .qa-pill .q-mini,
+    .qa .qa-pill .q-full {
+      transition: none;
     }
   }
   .qa-panel[hidden] {
