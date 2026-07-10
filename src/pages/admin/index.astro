@@ -23,6 +23,7 @@ export const prerender = false;
         <button data-tab="brands">Brands</button>
         <button data-tab="enquiries">Enquiries</button>
         <button data-tab="insights">Insights</button>
+        <a class="back-to-site" href="/">← Back to site</a>
       </nav>
     </header>
 
@@ -506,6 +507,17 @@ export const prerender = false;
         cursor: pointer;
       }
       .tabs button.is-active { color: var(--ink); background: var(--teal); border-color: var(--teal); }
+      .back-to-site {
+        font-family: var(--font-label);
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--teal);
+        padding: 0.5rem 0.4rem;
+        text-decoration: none;
+      }
+      .back-to-site:hover { color: var(--teal-hi); text-decoration: underline; text-underline-offset: 3px; }
       .panel { max-width: 72rem; margin-inline: auto; padding: 1.5rem var(--gutter) 4rem; }
       .status {
         position: fixed;
