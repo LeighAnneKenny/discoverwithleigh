@@ -157,6 +157,15 @@ Implemented: robots.txt (allow all, disallow /admin + /api, sitemap reference), 
 
 Blog, e-commerce, live Instagram API (deprecated by Meta; the gallery is curated via admin instead), whole-section admin management (deferred by decision), Workers AI chat (item 13 maybe-later).
 
+## Plan B: admin auth without Zero Trust (parked, 2026-07-11 — explicitly not a today thing)
+
+Context: the Zero Trust Free plan is why a payment method must stay on the account (it can't be removed while the subscription is active). If we ever want the card gone, Access goes too — this is the sketch of what replaces it:
+
+- **Swap point is already narrow:** `src/middleware.ts` is the single auth chokepoint. Replace the `Cf-Access-Jwt-Assertion` validation with a self-managed session check; the admin pages and API routes need no changes.
+- **Shape:** login page → password verified against a salted hash in a Worker secret → signed session cookie (WebCrypto HMAC, HttpOnly/Secure/SameSite=Strict, short TTL). Turnstile on the login form; failed-attempt counter in D1 (the metrics pattern) for lockout. Optional TOTP is ~30 lines of WebCrypto if wanted — no new dependencies either way.
+- **Trade-offs, stated plainly:** we'd own the auth security that Access currently provides for free (email OTP, Cloudflare's hardening, session management, an audit log). Two users (Leigh + Caveshen) makes the surface small, but Access is strictly stronger. The only prize is removing the payment method — and R2 would still be the spend vector regardless, so the zero-cost posture barely improves.
+- **Verdict when parked:** not worth it today; revisit only if Zero Trust's terms change or the card-on-file requirement starts to grate.
+
 ## Phases
 
 1. ✅ **Scaffold** — Astro + Wrangler deploying to a preview URL.
