@@ -8,6 +8,15 @@ import { createRemoteJWKSet, jwtVerify } from 'jose';
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Legacy WordPress URLs (PRD item 12): 301 the real pages to their new
+  // homes; the rest of the export debris (wp-content, feeds, wp-json…) falls
+  // through to the branded 404.
+  const { pathname, searchParams } = context.url;
+  if (pathname === '/privacy-policy.html') return context.redirect('/privacy-policy', 301);
+  if (pathname === '/index.html' || pathname === '/home' || pathname === '/home/' || (pathname === '/' && searchParams.has('p'))) {
+    return context.redirect('/', 301);
+  }
+
   if (!/^\/(admin|api\/admin)(\/|$)/.test(context.url.pathname)) return next();
 
   // Local development only: bypass requires the gitignored .dev.vars flag AND a

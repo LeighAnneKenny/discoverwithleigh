@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Aperture from '../components/Aperture.astro';
+
+// served on demand like the other pages (Layout pulls contact from D1)
+export const prerender = false;
+---
+<Layout title="Page not found | Discover With Leigh" description="That page doesn't exist — head back to Discover With Leigh.">
+  <section class="section lost">
+    <div class="wrap lost-inner">
+      <Aperture class="lost-mark" />
+      <h1 class="section-heading">Out of frame</h1>
+      <p class="lede">That page doesn’t exist — it may have moved when the site was rebuilt.</p>
+      <a class="btn" href="/">Back to the home page</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .lost {
+    min-height: 70svh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+  .lost-inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.2rem;
+  }
+  .lost :global(.lost-mark) {
+    width: 4.5rem;
+    height: 4.5rem;
+    color: var(--teal);
+  }
+</style>

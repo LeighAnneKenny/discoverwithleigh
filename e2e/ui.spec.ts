@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 // Deterministic runs: dark is the site's native scheme; light is tested explicitly.
 test.use({ colorScheme: 'dark', reducedMotion: 'reduce' });
@@ -149,3 +150,14 @@ for (const scheme of ['dark', 'light'] as const) {
     });
   });
 }
+
+test('accessibility: axe scan is clean (home + 404)', async ({ page }) => {
+  for (const path of ['/', '/no-such-page']) {
+    await page.goto(path);
+    const { violations } = await new AxeBuilder({ page }).analyze();
+    expect(
+      violations.map((v) => `${path} ${v.id} (${v.impact}): ${v.nodes.length}× ${v.help}`),
+      `axe violations on ${path}`,
+    ).toEqual([]);
+  }
+});

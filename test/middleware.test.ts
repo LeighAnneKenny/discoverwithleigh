@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:test';
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import { onRequest } from '../src/middleware';
+import { redirect } from './helpers';
 
 const saved = {
   team: env.ACCESS_TEAM_DOMAIN,
@@ -11,7 +12,7 @@ const call = (path: string, opts: { host?: string; token?: string } = {}) => {
   const url = new URL(`https://${opts.host ?? 'preview.discoverwithleigh.co.za'}${path}`);
   const headers = new Headers();
   if (opts.token) headers.set('Cf-Access-Jwt-Assertion', opts.token);
-  const context = { url, request: new Request(url, { headers }) } as any;
+  const context = { url, request: new Request(url, { headers }), redirect } as any;
   const next = () => Promise.resolve(new Response('passed'));
   return (onRequest as any)(context, next) as Promise<Response>;
 };
@@ -26,6 +27,29 @@ afterAll(() => {
   delete env.ADMIN_DEV_BYPASS;
   env.ACCESS_TEAM_DOMAIN = saved.team;
   env.ACCESS_AUD = saved.aud;
+});
+
+describe('legacy WordPress redirects', () => {
+  it('301s the old page URLs to their new homes', async () => {
+    const cases: [string, string][] = [
+      ['/privacy-policy.html', '/privacy-policy'],
+      ['/index.html', '/'],
+      ['/home', '/'],
+      ['/home/', '/'],
+      ['/?p=747', '/'],
+    ];
+    for (const [from, to] of cases) {
+      const res = await call(from);
+      expect(res.status, from).toBe(301);
+      expect(res.headers.get('Location'), from).toBe(to);
+    }
+  });
+
+  it('leaves export debris to the 404 page (no redirect)', async () => {
+    for (const path of ['/wp-content/uploads/x.jpg', '/feed/', '/wp-json/', '/xmlrpc.php', '/homely']) {
+      expect(await (await call(path)).text()).toBe('passed');
+    }
+  });
 });
 
 describe('admin auth middleware', () => {
