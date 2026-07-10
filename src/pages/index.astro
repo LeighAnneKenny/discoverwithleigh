@@ -11,6 +11,7 @@ import Reviews from '../components/Reviews.astro';
 import Brands from '../components/Brands.astro';
 import Contact from '../components/Contact.astro';
 import WhatsAppFab from '../components/WhatsAppFab.astro';
+import Qa from '../components/Qa.astro';
 import { loadContent, loadGallery, loadBrands } from '../lib/content';
 
 export const prerender = false;
@@ -31,9 +32,23 @@ const jsonLd = {
   knowsAbout: [...c.services],
   sameAs: c.socials.filter((s) => s.show).map((s) => s.url),
 };
+
+// FAQ structured data from the public Q&A items only — private ones (rates)
+// exist solely in the on-site widget (PRD item 13 sensitivity split)
+const publicQa = c.qa.filter((i) => i.show && i.public);
+const faqLd = publicQa.length && {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: publicQa.map((i) => ({
+    '@type': 'Question',
+    name: i.question,
+    acceptedAnswer: { '@type': 'Answer', text: i.answer },
+  })),
+};
 ---
 <Layout title={c.meta.title} description={c.meta.description}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  {faqLd && <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />}
   <Hero hero={c.hero} />
   <About about={c.about} services={c.services} />
   <Gallery photography={c.photography} items={gallery} />
@@ -48,4 +63,5 @@ const jsonLd = {
   <Brands items={brands} />
   <Contact contact={c.contact} socials={c.socials} />
   <WhatsAppFab contact={c.contact} />
+  <Qa qa={c.qa} contact={c.contact} />
 </Layout>

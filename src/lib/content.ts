@@ -14,6 +14,7 @@ const shape = {
   reviews: defaults.reviews,
   contact: defaults.contact,
   socials: defaults.socials,
+  qa: defaults.qa,
 };
 export type SiteContent = typeof shape;
 export const contentKeys = new Set(Object.keys(shape));

@@ -161,3 +161,27 @@ test('accessibility: axe scan is clean (home + 404)', async ({ page }) => {
     ).toEqual([]);
   }
 });
+
+test('Q&A widget: pill above FAB, chips reveal answers, CTAs correct', async ({ page }) => {
+  await page.goto('/');
+  const pill = page.locator('#qa-pill');
+  const fab = page.locator('.wa-fab');
+  await expect(pill).toBeVisible();
+  const pillBox = (await pill.boundingBox())!;
+  const fabBox = (await fab.boundingBox())!;
+  expect(pillBox.y + pillBox.height, 'pill sits above the FAB').toBeLessThanOrEqual(fabBox.y);
+
+  await pill.click();
+  const panel = page.locator('#qa-panel');
+  await expect(panel).toBeVisible();
+
+  const first = panel.locator('details').first();
+  await first.locator('summary').click();
+  await expect(first.locator('p')).toBeVisible();
+
+  await expect(panel.locator('.qa-wa')).toHaveAttribute('href', /wa\.me/);
+  await expect(panel.locator('.qa-contact')).toHaveAttribute('href', '#contact');
+
+  await page.keyboard.press('Escape');
+  await expect(panel).toBeHidden();
+});

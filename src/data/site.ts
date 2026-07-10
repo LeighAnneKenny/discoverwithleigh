@@ -151,3 +151,39 @@ export const contact = {
   studio: 'Century City, Cape Town, South Africa',
   whatsappMessage: 'Hi Leigh-Anne! I found your website and would love to chat about a shoot/campaign.',
 };
+
+// Q&A chips widget (PRD item 13). `show` gates the on-site widget; `public`
+// additionally publishes the item to llms.txt + FAQ JSON-LD for crawlers/LLMs
+// — rates stay public:false so they only ever exist in the widget.
+// Figures follow the same rule as contact PII: placeholders in source, real
+// values entered in admin (the rates seed ships hidden until Leigh fills it).
+export const qa = [
+  {
+    question: 'What do your shoots cost?',
+    answer:
+      'Every shoot is different, so I quote per brief — as a guide, packages start from R[amount]. Tell me what you have in mind and I’ll send a tailored quote the same day.',
+    show: false,
+    public: false,
+  },
+  {
+    question: 'How quickly will I get my photos?',
+    answer:
+      'I turn edited galleries around quickly — typically within a few days of the shoot. I’ll confirm an exact delivery date when we book.',
+    show: true,
+    public: true,
+  },
+  {
+    question: 'Where are you based, and do you travel?',
+    answer:
+      'I’m based in Century City and shoot all over Cape Town. Further afield is absolutely possible — travel is quoted as part of the brief.',
+    show: true,
+    public: true,
+  },
+  {
+    question: 'How do I book a shoot?',
+    answer:
+      'Send me a message on WhatsApp or through the contact form with the type of shoot, rough dates and location, and I’ll come back with availability and a quote.',
+    show: true,
+    public: true,
+  },
+];
