@@ -23,7 +23,7 @@ npm test                                                  # 29 API tests, vitest
 npx playwright test                                       # 78 UI tests, 6 device profiles
 npm run build && npx wrangler dev --port 8788 --host localhost   # local dev (see gotchas)
 npx wrangler deploy --config dist\server\wrangler.json    # deploy (after build; token env var above)
-npx wrangler d1 execute discoverwithleigh --local --file migrations/000X.sql   # + --remote before deploying dependent code
+npx wrangler d1 migrations apply discoverwithleigh --local   # + --remote before deploying dependent code (ledger backfilled 2026-07-12 — use this, not d1 execute --file)
 ```
 
 ## Gotchas that will bite you
@@ -40,6 +40,10 @@ npx wrangler d1 execute discoverwithleigh --local --file migrations/000X.sql   #
   `src/pages/admin/index.astro` + defaults in `src/data/site.ts`; the admin's generic
   list machinery does the rest. Migrations go in `migrations/` and must be applied
   local **and** remote, plus imported in `test/helpers.ts`.
+- The Worker entry is custom (`src/worker.ts` — adapter fetch + `scheduled()` for the
+  quota sentinel). Test the cron locally with `wrangler dev --test-scheduled` and
+  `curl http://localhost:8788/cdn-cgi/handler/scheduled?cron=0+*+*+*+*` (the old
+  `/__scheduled` path 404s). Sentinel secrets: `ANALYTICS_TOKEN`, `ALERT_EMAIL`.
 - The aperture mark's geometry is **frozen** (signed off) — everything inside r≤48 in
   `src/components/Aperture.astro` is verbatim; regenerate blade extensions only with
   `e2e-artifacts/aperture-extend.mjs` and only if the mark is retuned.

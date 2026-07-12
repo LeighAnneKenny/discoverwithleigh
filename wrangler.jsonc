@@ -4,7 +4,9 @@
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "discoverwithleigh",
 	"account_id": "7bab08e0bdbd9b52f1b05464feceb2d3",
-	"main": "@astrojs/cloudflare/entrypoints/server",
+	"main": "src/worker.ts",
+	// hourly quota sentinel (PRD item 15)
+	"triggers": { "crons": ["0 * * * *"] },
 	"routes": [
 		{
 			"pattern": "preview.discoverwithleigh.co.za",
@@ -27,9 +29,11 @@
 	],
 	"vars": {
 		// ENQUIRY_EMAIL is a Worker secret (wrangler secret put ENQUIRY_EMAIL) — no PII in source
+		// ANALYTICS_TOKEN + ALERT_EMAIL are Worker secrets too (quota sentinel, PRD item 15)
 		// Cloudflare Access config for /admin — empty AUD means admin is locked (fail closed)
 		"ACCESS_TEAM_DOMAIN": "https://ancient-water-ea57.cloudflareaccess.com",
-		"ACCESS_AUD": "542fc32bcc774bc0da68f76185a86fb3724ff50390300e77f24e580b4ffc2823"
+		"ACCESS_AUD": "542fc32bcc774bc0da68f76185a86fb3724ff50390300e77f24e580b4ffc2823",
+		"ACCOUNT_ID": "7bab08e0bdbd9b52f1b05464feceb2d3"
 	},
 	"assets": {
 		"directory": "./dist",
