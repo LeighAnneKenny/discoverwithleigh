@@ -24,7 +24,6 @@ export const nav = [
 ] as const;
 
 export const hero = {
-  title: 'Discover With Leigh',
   subtitle: 'Professional Photographer & Digital Marketing Specialist',
 };
 
