@@ -77,7 +77,8 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 # WAITING ON LEIGH
 
 - **Site review** — the current pause; feedback may spawn one more work round.
-- **Item 14 verdict** — aperture shutter-click v4 (see SHIPPED) is live on preview awaiting her approval; the three feedback rounds are recorded there.
+- **Item 14 verdict** — aperture shutter-click v4 (see SHIPPED) is live on preview awaiting her approval; the three feedback rounds are recorded there. *(Caveshen happy with it 2026-07-19; Leigh's verdict still open.)*
+- **Item 16 verdict** — film-strip counter-marquee, live on preview. *(Caveshen happy for now 2026-07-19; Leigh's verdict still open.)*
 - ~~Email destination verify click~~ ✅ done all along — API shows `discoverwithleigh@gmail.com` verified 2026-07-05 22:05, eleven minutes after registration. Email onboarding at cutover is unblocked.
 - 📨 **Item 5 — WhatsApp auto-response.** (Added 2026-07-06; handed to Leigh 2026-07-07. No site code; configured in the WhatsApp Business app on the phone holding the business contact number, under Settings → Business tools.)
   - **Greeting message** — https://faq.whatsapp.com/501866148528310 — auto-replies to first-time enquirers (or after 14 days' silence); this answers the website FAB's pre-filled message. Set recipients to "Everyone". Draft copy: *"Hi! Thanks for reaching out to Discover With Leigh 📸 I've seen your message and I'll get back to you personally within a few hours — usually much sooner. To speed things along, tell me a bit about what you have in mind: the type of shoot or campaign, and any dates you're eyeing."*
