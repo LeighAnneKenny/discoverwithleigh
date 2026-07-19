@@ -134,6 +134,23 @@ test('gallery: scrollable track, arrows per form factor, filters work', async ({
   }
 });
 
+test('gallery lightbox opens centered (item 17 regression)', async ({ page }) => {
+  await page.goto('/');
+  const shot = page.locator('.shot').first();
+  await shot.scrollIntoViewIfNeeded();
+  await shot.click();
+  const box = page.locator('#lightbox');
+  await expect(box).toBeVisible();
+  // settle: the dialog resizes once the full image arrives
+  await page.locator('#lightbox-img').evaluate(
+    (img: HTMLImageElement) => img.complete || new Promise((r) => (img.onload = r)),
+  );
+  const vp = page.viewportSize()!;
+  const b = (await box.boundingBox())!;
+  expect(Math.abs(b.x + b.width / 2 - vp.width / 2), 'horizontally centered').toBeLessThanOrEqual(4);
+  expect(Math.abs(b.y + b.height / 2 - vp.height / 2), 'vertically centered').toBeLessThanOrEqual(4);
+});
+
 test('contact: fields stay inside their card, Turnstile present', async ({ page }) => {
   await page.goto('/');
   const form = page.locator('.contact-form');

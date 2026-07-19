@@ -66,6 +66,12 @@ body:not(:has(.hero)) .site-header {
   box-sizing: border-box;
 }
 
+/* The reset above kills the UA's `dialog { margin: auto }`, pinning open
+   dialogs to the top-left — restore centering for all dialogs (item 17). */
+dialog {
+  margin: auto;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
