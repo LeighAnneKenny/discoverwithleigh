@@ -55,7 +55,14 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 
 # NEXT: buildable during the review pause
 
-*Nothing queued — all buildable work is shipped (item 15 closed 2026-07-13). What remains is WAITING ON LEIGH and the CUTOVER runbook.*
+16. **Brands section v3 — film-strip counter-marquee.** *(Leigh's review feedback 2026-07-19: the v2 marquee "looks a bit too similar to other sites" — the grayscale edge-faded logo marquee is the most templated pattern on the web. Workshop outcome: Caveshen's dual counter-scrolling rows + film-strip styling to make the motion unmistakably a photographer's.)*
+    - **Layout:** brands split server-side into two rows — top gets `ceil(n/2)`, bottom the rest; if the bottom row would be empty, fall back to a single strip. Rows scroll in opposite directions (pure CSS, `animation-direction: reverse` on row 2, slightly different durations so the pairing doesn't look mechanical).
+    - **Film-strip dressing:** each row styled as a strip of film — sprocket-hole bands top and bottom (CSS gradients, no images), frame separators, small generated contact-sheet frame numbers (decorative); admin `label` remains the caption. Film base stays ink-dark in **both** themes (film is dark — the light-theme brightness hack goes).
+    - **Behaviour kept from v2:** contained in `.wrap` (bug #2), edge-fade mask, grayscale→colour on hover + teal focus ring on the hovered frame, pause on hover, reduced-motion = static scrollable strip, duplicated loop content `aria-hidden`.
+    - **Loop correctness:** each animated half must exceed the container width regardless of brand count — repeat row items as needed for a seamless `-50%` loop.
+    - **No data changes:** existing `brands` schema (logo, `label`, `enabled`) suffices; no migration, no JS, no new dependencies.
+    - **Done when:** both suites green; screenshots (desktop + mobile, both themes, reduced-motion) reviewed by Caveshen; then deployed to preview for Leigh's verdict.
+    - *Status 2026-07-19:* built (pure-CSS "film gate" — sprocket bands fixed, logos move through them), reviewer approved 7/7, 34 API + 78 UI green, look approved by Caveshen; deployed to preview → awaiting Leigh's verdict.
 
 # WAITING ON LEIGH
 

@@ -3,65 +3,162 @@ import Eyebrow from './Eyebrow.astro';
 import type { MediaItem } from '../lib/content';
 
 const { items } = Astro.props as { items: MediaItem[] };
+
+const n = items.length;
+const split = Math.ceil(n / 2);
+const topItems = items.slice(0, split);
+const bottomItems = items.slice(split);
+const isSingle = bottomItems.length === 0;
+
+// Each animated half must exceed the container width — repeat until ≥ 10 tiles per half
+const topRepeats = Math.max(1, Math.ceil(10 / Math.max(1, topItems.length)));
+const botRepeats = isSingle ? 0 : Math.max(1, Math.ceil(10 / Math.max(1, bottomItems.length)));
+
+type TileData = { logo: MediaItem; frameNum: string; hiddenDup: boolean };
+
+function buildHalf(rowItems: MediaItem[], repeats: number, frameOffset: number): TileData[] {
+  const result: TileData[] = [];
+  for (let rep = 0; rep < repeats; rep++) {
+    for (let i = 0; i < rowItems.length; i++) {
+      result.push({
+        logo: rowItems[i],
+        frameNum: String(frameOffset + rep * rowItems.length + i + 1).padStart(2, '0') + 'A',
+        hiddenDup: rep > 0,
+      });
+    }
+  }
+  return result;
+}
+
+const topHalf = buildHalf(topItems, topRepeats, 0);
+const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
 ---
+
 <section class="section" id="brands">
   <div class="wrap reveal">
     <Eyebrow>Trusted collaborations</Eyebrow>
-    <h2 class="section-heading">Brands I’ve worked with</h2>
+    <h2 class="section-heading">Brands I've worked with</h2>
   </div>
   <div class="wrap reveal">
-    <div class="marquee" role="group" aria-label="Client brand logos">
-      <div class="marquee-track">
-        {[0, 1].map((dup) => (
-          <div class="marquee-half" aria-hidden={dup === 1 ? 'true' : undefined}>
-            {items.map((logo) => (
-              <figure class="brand-tile">
-                <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
-                {logo.label && <figcaption>{logo.label}</figcaption>}
-              </figure>
+    <div class="film-marquee" role="group" aria-label="Client brand logos">
+
+      <div class="film-strip">
+        <div class="strip-track strip-track--fwd">
+          {[0, 1].map((dupHalf) => (
+            <div class="strip-half" aria-hidden={dupHalf === 1 ? 'true' : undefined}>
+              {topHalf.map(({ logo, frameNum, hiddenDup }) => (
+                <figure
+                  class="brand-tile"
+                  aria-hidden={dupHalf === 0 && hiddenDup ? 'true' : undefined}
+                >
+                  <span class="frame-num" aria-hidden="true">{frameNum}</span>
+                  <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
+                  {logo.label && <figcaption>{logo.label}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {!isSingle && (
+        <div class="film-strip">
+          <div class="strip-track strip-track--rev">
+            {[0, 1].map((dupHalf) => (
+              <div class="strip-half" aria-hidden={dupHalf === 1 ? 'true' : undefined}>
+                {botHalf.map(({ logo, frameNum, hiddenDup }) => (
+                  <figure
+                    class="brand-tile"
+                    aria-hidden={dupHalf === 0 && hiddenDup ? 'true' : undefined}
+                  >
+                    <span class="frame-num" aria-hidden="true">{frameNum}</span>
+                    <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
+                    {logo.label && <figcaption>{logo.label}</figcaption>}
+                  </figure>
+                ))}
+              </div>
             ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
     </div>
   </div>
 </section>
 
 <style>
-  .marquee {
+  /* ---- outer container: clips both strips, applies edge-fade mask ---- */
+  .film-marquee {
     overflow: hidden;
     margin-top: 1rem;
     mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  }
-  .marquee-track {
     display: flex;
-    width: max-content;
-    animation: brands-marquee 50s linear infinite;
-  }
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-  /* two identical halves so the -50% loop point is seamless */
-  .marquee-half {
-    display: flex;
-    gap: 1px;
-    padding-right: 1px;
-  }
-  @keyframes brands-marquee {
-    to {
-      translate: -50% 0;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee {
-      overflow-x: auto;
-    }
-    .marquee-track {
-      animation: none;
-    }
+    flex-direction: column;
+    gap: 3px;
   }
 
+  /* Pause both rows when hovering anywhere on the marquee */
+  .film-marquee:hover .strip-track {
+    animation-play-state: paused;
+  }
+
+  /* ---- film strip: dark base + sprocket bands via ::before/::after ---- */
+  .film-strip {
+    /* Force dark film-base in both themes — real film is dark.
+       ponytail: mirrors .always-dark's values; can't reuse the class — it also
+       sets color: var(--paper), which the tiles don't want */
+    --ink: #0b0d0d;
+    --line: #242b29;
+    --mist: #97a09c;
+    --teal: #00a79d;
+    background: #0b0d0d;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Sprocket-hole bands: repeating radial dots on a near-black bar */
+  .film-strip::before,
+  .film-strip::after {
+    content: '';
+    display: block;
+    height: 0.6rem;
+    flex-shrink: 0;
+    background-color: #070908;
+    background-image: radial-gradient(circle, #1e2522 38%, transparent 39%);
+    background-size: 1.4rem 0.6rem;
+    background-position: 0.7rem 50%;
+  }
+
+  /* ---- animated track ---- */
+  .strip-track {
+    display: flex;
+    width: max-content;
+  }
+
+  /* Two identical halves; animating the whole track by -50% loops seamlessly */
+  @keyframes brands-marquee {
+    to { translate: -50% 0; }
+  }
+
+  .strip-track--fwd {
+    animation: brands-marquee 50s linear infinite;
+  }
+
+  .strip-track--rev {
+    animation: brands-marquee 62s linear infinite;
+    animation-direction: reverse;
+  }
+
+  /* ---- half: row of tiles ---- */
+  .strip-half {
+    display: flex;
+    gap: 1px;
+    padding-right: 1px; /* maintains 1px seam at the loop point */
+  }
+
+  /* ---- individual frame (brand tile) ---- */
   .brand-tile {
+    position: relative;
     flex: none;
     width: 9.5rem;
     aspect-ratio: 1;
@@ -73,24 +170,31 @@ const { items } = Astro.props as { items: MediaItem[] };
     place-items: center;
     align-content: center;
     gap: 0.5rem;
+    transition: outline-color 0.2s;
+    outline: 2px solid transparent;
+    outline-offset: -1px;
   }
+
+  .brand-tile:hover {
+    outline-color: var(--teal);
+  }
+
   .brand-tile img {
     max-width: 100%;
     max-height: 5.5rem;
     width: auto;
     height: auto;
+    /* Always the dark-tile treatment — film base is dark in both themes */
     filter: grayscale(1) brightness(1.6);
     opacity: 0.75;
     transition: filter 0.3s, opacity 0.3s;
   }
+
   .brand-tile:hover img {
     filter: none;
     opacity: 1;
   }
-  /* the brightness lift is for dark tiles; on light tiles darken instead */
-  :global([data-theme='light']) .brand-tile img {
-    filter: grayscale(1) brightness(0.85);
-  }
+
   .brand-tile figcaption {
     font-family: var(--font-label);
     font-size: 0.6rem;
@@ -99,5 +203,40 @@ const { items } = Astro.props as { items: MediaItem[] };
     text-transform: uppercase;
     color: var(--mist);
     text-align: center;
+  }
+
+  /* Decorative contact-sheet frame number — purely visual, aria-hidden */
+  .frame-num {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.3rem;
+    font-family: var(--font-label);
+    font-size: 0.45rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--mist);
+    opacity: 0.4;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ---- reduced motion: static scrollable strips, no animation ---- */
+  @media (prefers-reduced-motion: reduce) {
+    .film-marquee {
+      overflow: visible;
+      mask-image: none;
+    }
+    .film-strip {
+      overflow-x: auto;
+    }
+    .strip-track {
+      animation: none;
+    }
+    /* Hide duplicates — only show one copy of each brand */
+    .strip-half[aria-hidden='true'],
+    .brand-tile[aria-hidden='true'] {
+      display: none;
+    }
   }
 </style>
