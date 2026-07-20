@@ -151,6 +151,33 @@ test('gallery lightbox opens centered (item 17 regression)', async ({ page }) =>
   expect(Math.abs(b.y + b.height / 2 - vp.height / 2), 'vertically centered').toBeLessThanOrEqual(4);
 });
 
+test('brands strip: colour by default, hover greys the rest (item 20)', async ({ page }) => {
+  await page.goto('/');
+  // The file-wide test.use({ reducedMotion }) doesn't stop this marquee in
+  // practice — verified: drop this line and scrollIntoViewIfNeeded below times
+  // out at 30s chasing a moving tile. This is the only test that grabs an
+  // element inside an animation, so it's the only one that notices.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const hovered = page.locator('#brands .strip-track--fwd .brand-tile').first();
+  // the opposite row: the grey-out is marquee-wide, matching the marquee-wide pause
+  const rowMate = page.locator('#brands .strip-track--rev .brand-tile').first();
+  const filterOf = (tile: typeof hovered) => tile.locator('img').evaluate((img) => getComputedStyle(img).filter);
+
+  await hovered.scrollIntoViewIfNeeded();
+  expect(await filterOf(hovered), 'colour by default').toBe('none');
+  expect(await filterOf(rowMate), 'colour by default').toBe('none');
+
+  // poll rather than sleep past the 0.3s transition — the filter is mid-flight
+  // for a moment after each pointer move
+  await hovered.hover();
+  await expect.poll(() => filterOf(rowMate), { message: 'other row greys out too' }).toContain('grayscale');
+  expect(await filterOf(hovered), 'hovered frame stays colour').toBe('none');
+
+  await page.mouse.move(0, 0);
+  await expect.poll(() => filterOf(rowMate), { message: 'colour restored after mouseout' }).toBe('none');
+  expect(await filterOf(hovered), 'colour restored after mouseout').toBe('none');
+});
+
 test('contact: fields stay inside their card, Turnstile present', async ({ page }) => {
   await page.goto('/');
   const form = page.locator('.contact-form');

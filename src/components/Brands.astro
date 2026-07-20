@@ -184,15 +184,25 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     max-height: 5.5rem;
     width: auto;
     height: auto;
-    /* Always the dark-tile treatment — film base is dark in both themes */
-    filter: grayscale(1) brightness(1.6);
-    opacity: 0.75;
+    /* Colour by default; hovering/focusing a frame greys out its row-mates
+       (below) instead — film base is dark in both themes */
+    filter: none;
+    opacity: 1;
     transition: filter 0.3s, opacity 0.3s;
   }
 
-  .brand-tile:hover img {
-    filter: none;
-    opacity: 1;
+  /* Scoped to an actual frame hover — a bare .film-marquee:hover would grey
+     every logo with none highlighted when the pointer is over the sprocket-band
+     gaps between frames. Marquee-wide, matching the pause above: both rows
+     freeze, so both rows dim.
+     ponytail: hover-only by design. The tiles are decorative <figure>s (alt="",
+     no link), and most sit inside aria-hidden marquee duplicates — making them
+     focusable to mirror this on :focus-visible would add ~56 tab stops and trip
+     axe's aria-hidden-focus rule. Add the :focus-visible twin if tiles ever
+     become links. */
+  .film-marquee:has(.brand-tile:hover) .brand-tile:not(:hover) img {
+    filter: grayscale(1) brightness(1.6);
+    opacity: 0.75;
   }
 
   .brand-tile figcaption {
