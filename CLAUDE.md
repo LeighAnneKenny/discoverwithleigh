@@ -19,8 +19,8 @@ shipped record. Item numbers are stable IDs — never renumber.
 ## Commands
 
 ```sh
-npm test                                                  # 29 API tests, vitest-in-workerd
-npx playwright test                                       # 78 UI tests, 6 device profiles
+npm test                                                  # API tests, vitest-in-workerd
+npx playwright test                                       # UI tests, 6 device profiles + round-trip project
 npm run build && npx wrangler dev --port 8788 --host localhost   # local dev (see gotchas)
 npx wrangler deploy --config dist\server\wrangler.json    # deploy (after build; token env var above)
 npx wrangler d1 migrations apply discoverwithleigh --local   # + --remote before deploying dependent code (ledger backfilled 2026-07-12 — use this, not d1 execute --file)
@@ -58,3 +58,19 @@ npx wrangler d1 migrations apply discoverwithleigh --local   # + --remote before
 - Don't put transforms on tiles whose seams are faked with gap+background (hairlines
   vanish at fractional display scaling); QA hairlines with `--force-device-scale-factor=1.25`.
 - Android tap-highlight paints tapped `<summary>` blocks — `-webkit-tap-highlight-color: transparent`.
+- A `* { margin: 0 }` reset silently kills the UA's `dialog { margin: auto }` and pins a
+  native `<dialog>` to the top-left. Restore it globally and keep the centring test.
+- Match a new hover effect's scope to the existing hover behaviour's scope — a per-row
+  rule beside a marquee-wide pause rule froze one row and lit the other.
+- Ask about force-dark browser extensions before repainting colour work. A "brown
+  background" bug once turned out to be Dark Reader re-tinting the page.
+
+## Working practices
+
+- **Verify a reviewer's claim by experiment before acting on it.** One review was right
+  that a rule was dead code and wrong about the fix, and wrong to doubt a test's
+  `emulateMedia({ reducedMotion })` call — deleting it makes `scrollIntoViewIfNeeded`
+  time out chasing the marquee.
+- **PRD status lines flatter themselves.** A shipped item claimed UI coverage it never
+  had; check the spec files, not the status note.
+- `wrangler secret put` intermittently fails with "malformed response" (API 522) — retry.

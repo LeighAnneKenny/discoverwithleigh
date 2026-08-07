@@ -27,7 +27,7 @@ Replace the static WordPress/Divi export with a fast, owned, editable site — s
 | Spam protection | Cloudflare Turnstile |
 | Enquiry email | Cloudflare Email Sending — Worker binding, no third party. Sends to Leigh's verified destination address are quota-free on all plans. (Supersedes Resend, 2026-07-05.) |
 | CI/CD | GitHub Actions — test-gated `wrangler deploy` on push to main (validated 2026-07-08) |
-| Tests | Vitest (`npm test`, 19 API tests in workerd) + Playwright (`npx playwright test`, 60 UI tests, 6 device profiles) |
+| Tests | Vitest (`npm test`, API suite in workerd) + Playwright (`npx playwright test`, 6 device profiles + round-trip project) |
 
 ## Brand
 

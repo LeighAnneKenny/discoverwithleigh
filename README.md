@@ -46,7 +46,8 @@ bug in its workerd runner; use the build + `wrangler dev` flow above.
 
 ```sh
 npm test              # API suite — vitest running inside workerd against a real local D1
-npx playwright test   # UI suite — 6 device profiles (desktop 1080p/1440p/4K, iPhone, Galaxy); boots its own server
+npx playwright test   # UI suite — 6 device profiles (desktop 1080p/1440p/4K, iPhone, Galaxy)
+                       # plus a round-trip project (admin edit → rendered page); boots its own server
 ```
 
 ## Deploying
