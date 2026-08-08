@@ -47,7 +47,7 @@ export const services = [
 export const photography = {
   eyebrow: 'Capturing moments & memories',
   heading: 'Professional Photography',
-  body: 'Photography is at the heart of everything I do. It’s more than just my passion — it’s the foundation of my work and what drives me to excel in every project. I specialise in Product, Lifestyle, Music, Portrait, Wedding, and Property Photography, delivering high-quality images tailored to your needs. With a focus on vibrant, emotional, and warm visuals, I approach every shoot with creativity and dedication, ensuring that your vision is brought to life with precision and care.',
+  body: 'Photography is at the heart of everything I do. It’s more than just my passion — it’s the foundation of my work and what drives me to excel in every project. I specialise in Product, Lifestyle, Music, Portrait, Wedding, Vacation, and Property Photography, delivering high-quality images tailored to your needs. With a focus on vibrant, emotional, and warm visuals, I approach every shoot with creativity and dedication, ensuring that your vision is brought to life with precision and care. Visiting Cape Town? I also shoot holiday sessions for travellers — at your stay or out on location.',
   categories: ['Portraits', 'Weddings', 'Property', 'Live Music', 'Product', 'Lifestyle'] as const,
   cta: { line: 'Let’s make your ideas & memories come to life!', label: 'Get started here' },
 };
@@ -175,6 +175,13 @@ export const qa = [
     question: 'Where are you based, and do you travel?',
     answer:
       'I’m based in Century City and shoot all over Cape Town. Further afield is absolutely possible — travel is quoted as part of the brief.',
+    show: true,
+    public: true,
+  },
+  {
+    question: 'Do you shoot for visitors to Cape Town?',
+    answer:
+      'Yes — I photograph travellers all over Cape Town: couples, families, proposals and special occasions, at your accommodation or out on location. Tell me your dates and I’ll build a session around your stay.',
     show: true,
     public: true,
   },

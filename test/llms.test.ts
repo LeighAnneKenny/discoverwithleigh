@@ -24,6 +24,9 @@ describe('llms.txt sensitivity split (PRD item 13)', () => {
     const text = await fetchText();
     expect(text).toContain('## Quick answers');
     expect(text).toContain('Where are you based');
+    // new visitor Q&A (PRD item 21c) — public:true so it must surface here
+    expect(text).toContain('Do you shoot for visitors to Cape Town?');
+    expect(text).toContain('photograph travellers');
     // the rates seed is public:false (and hidden) — must not leak
     expect(text).not.toContain('cost');
   });
