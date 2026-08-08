@@ -33,10 +33,14 @@ const socialIcons: Record<string, string> = {
       <Eyebrow>Get in touch</Eyebrow>
       <h2 class="section-heading">Let’s make your vision a reality</h2>
       <dl class="contact-details">
-        <dt>Call</dt>
-        <dd><a href={contact.phoneHref}>{contact.phone}</a></dd>
-        <dt>Email</dt>
-        <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+        {contact.phone && contact.phoneHref && <>
+          <dt>Call</dt>
+          <dd><a href={contact.phoneHref}>{contact.phone}</a></dd>
+        </>}
+        {contact.email && <>
+          <dt>Email</dt>
+          <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+        </>}
         <dt>Studio</dt>
         <dd>{contact.studio}</dd>
       </dl>

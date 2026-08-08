@@ -79,7 +79,7 @@ const { contact } = await loadContent(); // footer email comes from D1, not sour
         <div class="footer-legal">
           <p><a href="/privacy-policy">Privacy Policy</a></p>
           <p>&copy; {new Date().getFullYear()} Discover With Leigh. All rights reserved.</p>
-          <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+          {contact.email && <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>}
         </div>
       </div>
     </footer>
