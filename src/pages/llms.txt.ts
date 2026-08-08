@@ -14,6 +14,8 @@ export const GET: APIRoute = async () => {
 
 > Professional photographer and digital marketing specialist based in Century City, Cape Town, South Africa. Leigh-Anne Kenny creates photography, marketing video content, social media management, and influencer campaigns for brands, agencies, couples, and small businesses.
 
+Also shoots for travellers and tourists visiting Cape Town — Airbnb stays, photographer-for-a-day sessions, and special occasions — alongside weddings and brand content.
+
 ## Services
 
 - Professional photography: product, lifestyle, music, portrait, wedding, and property photography

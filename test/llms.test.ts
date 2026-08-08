@@ -28,6 +28,12 @@ describe('llms.txt sensitivity split (PRD item 13)', () => {
     expect(text).not.toContain('cost');
   });
 
+  it('mentions travel/vacation audience alongside weddings (PRD item 21)', async () => {
+    const text = await fetchText();
+    expect(text).toContain('travellers');
+    expect(text).toContain('weddings');
+  });
+
   it('never leaks public:false items, even when shown in the widget', async () => {
     await putRow('qa', [
       { question: 'What are your rates?', answer: 'Secret rates from R999.', show: true, public: false },

@@ -3,7 +3,7 @@
 export const meta = {
   title: 'Discover With Leigh | Photographer & Digital Marketing Specialist',
   description:
-    'Professional photography, video creation, social media management and influencer campaigns in Cape Town. Let’s bring your brand to life through stunning visuals and compelling marketing.',
+    'Cape Town photographer for weddings, vacation shoots and special occasions — video, social media and influencer campaigns that bring your brand to life.',
   url: 'https://discoverwithleigh.co.za',
 };
 

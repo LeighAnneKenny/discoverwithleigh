@@ -29,7 +29,12 @@ const jsonLd = {
   email: c.contact.email,
   address: { '@type': 'PostalAddress', addressLocality: 'Century City, Cape Town', addressCountry: 'ZA' },
   areaServed: 'Cape Town, South Africa',
-  knowsAbout: [...c.services],
+  knowsAbout: [
+    ...c.services,
+    ...c.photography.categories,
+    'Vacation and travel photography',
+    'Special occasion and event photography',
+  ],
   sameAs: c.socials.filter((s) => s.show).map((s) => s.url),
 };
 
