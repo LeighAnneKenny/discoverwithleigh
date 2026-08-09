@@ -40,6 +40,7 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     <h2 class="section-heading">Brands I've worked with</h2>
   </div>
   <div class="wrap reveal">
+    <div class="film-shadow">
     <div class="film-marquee" role="group" aria-label="Client brand logos">
 
       <div class="film-strip">
@@ -83,14 +84,50 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
       )}
 
     </div>
+    </div>
   </div>
 </section>
 
 <style>
+  /* Shadow as symmetric top/bottom bands — vertical pop only, no side
+     spill (drop-shadow blur is radial, it can't do directional-only).
+     The bands wear the same edge-fade mask as the marquee so they die
+     out with the film ends. Dark theme lifts them to grey via --shadow. */
+  .film-shadow {
+    position: relative;
+    margin-top: 1rem;
+  }
+
+  .film-shadow::before,
+  .film-shadow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.4rem;
+    pointer-events: none;
+    --shadow: 7 9 8;
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .film-shadow::before {
+    bottom: 100%;
+    background: linear-gradient(to top, rgb(var(--shadow) / 0.32), rgb(var(--shadow) / 0.1) 55%, transparent);
+  }
+
+  .film-shadow::after {
+    top: 100%;
+    background: linear-gradient(to bottom, rgb(var(--shadow) / 0.32), rgb(var(--shadow) / 0.1) 55%, transparent);
+  }
+
+  :global([data-theme='dark']) .film-shadow::before,
+  :global([data-theme='dark']) .film-shadow::after {
+    --shadow: 160 168 164;
+  }
+
   /* ---- outer container: clips both strips, applies edge-fade mask ---- */
   .film-marquee {
     overflow: hidden;
-    margin-top: 1rem;
     mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
     display: flex;
     flex-direction: column;
@@ -110,23 +147,26 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     --ink: #0b0d0d;
     --line: #242b29;
     --mist: #97a09c;
-    --teal: #00a79d;
     background: #0b0d0d;
     display: flex;
     flex-direction: column;
   }
 
-  /* Sprocket-hole bands: repeating radial dots on a near-black bar */
+  /* Sprocket-hole bands: white KS-style perforations (landscape rectangles,
+     ~1.4:1 like real 35mm) punched through the dark bar. The gradient paints
+     one perf per 1.4rem tile; origin/clip content-box insets it vertically. */
   .film-strip::before,
   .film-strip::after {
     content: '';
     display: block;
-    height: 0.6rem;
+    height: 0.7rem;
     flex-shrink: 0;
-    background-color: #070908;
-    background-image: radial-gradient(circle, #1e2522 38%, transparent 39%);
-    background-size: 1.4rem 0.6rem;
-    background-position: 0.7rem 50%;
+    box-sizing: border-box;
+    padding: 0.16rem 0;
+    background-image: linear-gradient(90deg, transparent 0.425rem, #f2f0ea 0.425rem 0.975rem, transparent 0.975rem);
+    background-size: 1.4rem 100%;
+    background-origin: content-box;
+    background-clip: content-box;
   }
 
   /* ---- animated track ---- */
@@ -170,13 +210,6 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     place-items: center;
     align-content: center;
     gap: 0.5rem;
-    transition: outline-color 0.2s;
-    outline: 2px solid transparent;
-    outline-offset: -1px;
-  }
-
-  .brand-tile:hover {
-    outline-color: var(--teal);
   }
 
   .brand-tile img {
@@ -235,6 +268,10 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
   @media (prefers-reduced-motion: reduce) {
     .film-marquee {
       overflow: visible;
+      mask-image: none;
+    }
+    .film-shadow::before,
+    .film-shadow::after {
       mask-image: none;
     }
     .film-strip {
