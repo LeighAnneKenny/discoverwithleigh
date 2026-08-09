@@ -1,0 +1,81 @@
+---
+import Eyebrow from './Eyebrow.astro';
+import type { SiteContent, MediaItem } from '../lib/content';
+
+interface Props {
+  visitors: SiteContent['visitors'];
+  gallery: MediaItem[];
+}
+
+const { visitors, gallery } = Astro.props;
+
+// printIds resolution: use admin-curated id list; fall back to first five
+// Lifestyle-category gallery items when the list is empty (fresh installs,
+// local dev where ids differ from remote D1).
+// ponytail: empty printIds is the default — gallery ids differ between local
+// and remote D1, so no ids are baked into source (PRD item 25 caution).
+// Prints stay paper-light in both themes: a print is a physical object, the
+// same rule that keeps the film strip dark.
+let pics: MediaItem[];
+if (visitors.printIds.length > 0) {
+  const byId = new Map(gallery.map((g) => [g.id, g]));
+  pics = visitors.printIds
+    .map((id) => byId.get(id))
+    .filter((g): g is MediaItem => g !== undefined)
+    .slice(0, 5);
+} else {
+  pics = gallery
+    .filter((g) => g.categories?.some((c) => c.toLowerCase() === 'lifestyle'))
+    .slice(0, 5);
+}
+
+const tilts = [-2, 1.5, -1, 2, -1.5];
+---
+<section class="section" id="vacation">
+  <div class="wrap">
+    <div class="reveal">
+      <Eyebrow>{visitors.eyebrow}</Eyebrow>
+      <h2 class="section-heading">{visitors.heading}</h2>
+      {visitors.body.map((p) => <p class="lede">{p}</p>)}
+    </div>
+    <div class="print-band reveal" aria-label="Vacation photographs">
+      {pics.map((p, i) => (
+        <figure class="print" style={`--tilt: ${tilts[i]}deg`}>
+          <img src={p.url} width={p.w} height={p.h} alt="Holiday photograph from a Cape Town session" loading="lazy" decoding="async" />
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Paper prints, holiday-snap scatter. One row, centred, aligned with the
+     section column: the prints total ~120% of the wrap's width, so with
+     justify-content center they overflow BOTH wrap edges equally and the outer
+     prints crop on purpose. No scroll — the band clips; vertical padding keeps
+     the print shadows unclipped. */
+  .print-band {
+    display: flex;
+    justify-content: center;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    overflow: hidden;
+    margin-top: 2.75rem;
+    padding: 0.75rem 0 1.25rem;
+  }
+  .print {
+    flex: none;
+    width: max(24%, 9rem);
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    padding: 0.45rem 0.45rem 1.6rem;
+    background: #f2f1ec;
+    box-shadow: 0 0.5rem 1.2rem rgb(7 9 8 / 0.3);
+    rotate: var(--tilt);
+  }
+  .print img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

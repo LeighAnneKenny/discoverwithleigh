@@ -76,7 +76,7 @@ export const prerender = false;
       const LABELS: Record<string, string> = {
         meta: 'Site metadata', hero: 'Hero', about: 'About', services: 'Services list',
         photography: 'Photography', video: 'Video', marketing: 'Social media management',
-        influencer: 'Influencer', reviews: 'Client reviews', contact: 'Contact details',
+        visitors: 'Visitors', reviews: 'Client reviews', contact: 'Contact details',
         socials: 'Social links', qa: 'Q&A (chips widget)',
       };
       const content: Record<string, any> = await api('/api/admin/content');
@@ -373,7 +373,7 @@ export const prerender = false;
       // funnel. Traffic (referrers/countries) arrives with Web Analytics at
       // launch — stubbed until then.
       const insTab = $('#tab-insights');
-      const SECTION_ORDER = ['about', 'photography', 'video', 'marketing', 'influencer', 'reviews', 'brands', 'contact'];
+      const SECTION_ORDER = ['about', 'photography', 'video', 'marketing', 'vacation', 'reviews', 'brands', 'contact'];
 
       function dayKeys(days: number) {
         return Array.from({ length: days }, (_, i) => new Date(Date.now() - (days - 1 - i) * 864e5).toISOString().slice(0, 10));

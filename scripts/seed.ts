@@ -24,7 +24,7 @@ const content: Record<string, unknown> = {
   photography: site.photography,
   video: site.video,
   marketing: site.marketing,
-  influencer: site.influencer,
+  visitors: site.visitors,
   reviews: site.reviews,
   contact: site.contact,
   socials: site.socials,

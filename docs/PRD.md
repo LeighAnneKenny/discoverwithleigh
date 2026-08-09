@@ -102,6 +102,34 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
     - **Hover outline removed:** the teal outline on hovered tiles hinted the non-link tiles were clickable (Leigh/Caveshen). The grey-out plus the paused reel carry the hover affordance alone. Orphaned `--teal` variable removed with it.
     - *Status 2026-08-09: built inline, accepted as-is by Caveshen on local dev; both suites green; deployed to preview for Leigh's verdict.*
 
+25. **Visitors section — the Influencer swap-over.** *(Leigh's direction 2026-08-09, via Caveshen: a section aimed at Cape Town visitors — tourists who want a photographer for a day. Influencer work is her least favourite part of the job, so its section gives up the slot. This supersedes the parked `/vacation-photography` landing page: same goal, zero new pages, lives on the page that already ranks.)*
+    - **Decisions on record (Caveshen, 2026-08-09):**
+      - **Influencer stays an offering, leaves the stage.** The page section is replaced. Influencer campaigns remain quietly available: kept in the JSON-LD service list and llms.txt, plus one low-key mention — a sentence in the Marketing body or a Q&A item (choose during copy draft, whichever reads less like an ad).
+      - **Presentation is workshopped, not assumed.** Candidates: (a) copy + CTA matching the sibling sections; (b) copy + an embedded mini-strip of Vacation-category gallery images; (c) something bespoke from the workshop. Rendered options on local dev, Caveshen/Leigh pick — the item 19/24 method.
+      - **Copy: we draft, Leigh approves** — the item 21(c) precedent, line-by-line accept/amend/reject.
+    - **Technical shape (from the codebase as it stands):**
+      - **New content key** (working name `visitors`), not a mutation of `influencer`: shape entry in `src/lib/content.ts`, LABELS entry in admin, defaults in `src/data/site.ts`. A new key has no remote D1 row, so nothing masks its defaults (the item 21(c) lesson). The `influencer` key retires from the shape when its copy leaves the page; its stale D1 row is harmless (item 18 proved the merge ignores unknown keys).
+      - **Nav:** "Influencer" label and `#influencer` anchor replaced. Pre-live, so no external anchor links to preserve; item 12's legacy redirects are path-based and unaffected.
+      - **Machine surfaces:** JSON-LD service list gains visitor/vacation photography and keeps influencer campaigns; llms.txt gains the section's line; the visitor Q&A (21c1) and the new section's CTA must tell the same story.
+      - **Gallery dependency:** the Vacation category (item 21d) — Caveshen tags and categorises the photos. Hard prerequisite only if presentation (b) wins; the filter category is wanted regardless.
+      - **Tests:** the exhaustiveness check enumerates every editable key — `visitors` needs render coverage, `influencer` leaves the enumeration; round-trip stays green; e2e nav/section assertions updated; both suites green as always.
+      - **Adjacent, unchanged:** hero subtitle (21c3) remains HELD with Leigh; this item neither needs it nor blocks on it.
+    - **Sequencing:** spec to Leigh via Caveshen → **explicit go** → presentation workshop on local dev (run under the frontend-design skill — deliberate art direction, not a templated section) → copy draft folded into the workshop render → Leigh picks/approves → build per pipeline (worker → reviewer) → preview → her verdict.
+    - **Done when:** presentation chosen; copy approved by Leigh; suites green; reviewed; deployed to preview; no PII in tracked files.
+    - *Status 2026-08-09 — workshop round 1 done, decisions in (Caveshen):*
+      - **Option B accepted** (copy + mini-strip of prints), with tweaks: original paper-print styling (4:5, thin borders, deeper bottom edge, tilt scatter) — an Instax-proportioned variant was tried and **reverted as overdone**; **one row, no scroll, aligned with the section column** — the row is deliberately ~120% of the wrap's width, centred, so the outer prints crop at both wrap edges on purpose (Caveshen's direction; a full-viewport bleed was tried and pulled back — the crop belongs at the section width). Prints stay paper-light in both themes (physical-object rule, the film strip's dark twin).
+      - **Option C (postcard) blessed as a held concept** — aperture-mark postage stamp, Cape Town postmark, handwritten message. Not built now; markup and styles preserved in `docs/postcard-concept.md` for later use. Option A discarded.
+      - **Photos: five hand-picked gallery images, stored as an id list** (`visitors.printIds`, the `video.tiktokIds` pattern — admin-curatable through the same generic machinery). Unset/empty list falls back to Lifestyle-category first-five, so fresh installs render. Interim picks are Claude's from the Lifestyle category; Caveshen re-picks in admin later. **Caution for build: gallery ids differ between local and remote D1 — seed defaults must not bake in local ids** (fallback covers the fresh case; the real picks live in the D1 content row). Better vacation photos remain a pre-cutover task in the runbook; the Vacation category (21d) remains Caveshen's.
+      - **Influencer retires by un-mounting, not deletion** — `Influencer.astro` stays on disk for possible return; only the shape key, admin LABELS entry, and page mount go.
+      - **Copy:** draft de-em-dashed per Caveshen; the full copy review is Leigh's, held.
+    - *Status 2026-08-09 — built, reviewed, shipped to preview (Caveshen's "ship it" after six workshop rounds).* Worker build: `visitors` key (shape/defaults/admin LABELS/seed), content-driven `Visitors.astro` (`id="vacation"`, printIds resolution with case-insensitive Lifestyle fallback, cap 5), nav → Vacation/#vacation, Influencer un-mounted (component file intact on disk). Reviewer first pass: **request-changes** — real catch: the metrics section allowlist still accepted `section:influencer`, so the new section's funnel would have recorded zero forever; fixed to `section:vacation`, plus two nits (dead tilt guard, duplicated printIds comment). Re-review: approve, no collateral. 38 API + 91 UI green. **Grep note for future work: the feature wears two names by design — `visitors` (content key, component, props) and `vacation` (id, anchor, nav, SECTION_ORDER, metrics) — search both.** Remote D1 has no `visitors` row, so code defaults flow to preview untouched; Caveshen picks the five prints in admin (empty `printIds` → Lifestyle fallback meanwhile); copy review remains Leigh's, on preview.
+
+26. **Admin section visibility toggles. (FUTURE — idea logged 2026-08-09, not actioned.)** *(Caveshen, during the item 25 workshop: the page sections are modular — each owns its copy, CTA, and images — so admin could carry a simple per-section Shown/Hidden toggle controlling what renders on the site.)*
+    - **Prior art in the codebase:** the pattern already exists at item level — `socials[*].show` and `qa[*].show` are exactly this, flowing through the admin's generic machinery and sitting on the exhaustiveness test's exemption list. A section-level `show` boolean per content key is the same idea one level up.
+    - **Synergy with item 25:** a visibility toggle is the graceful return path for Influencer (and any future seasonal section) — mount every section, let admin decide what shows; retirement stops being a code change.
+    - **To resolve at spec time:** nav coupling (a hidden section's nav item and CtaBand must hide with it); machine surfaces (does hiding a section pull its line from llms.txt/JSON-LD? — presumably yes, same visibility rule as the Q&A `show`/`public` split); default state seeding; exhaustiveness-test exemptions.
+    - **Not scheduled** — revisit after item 25 ships and Leigh's review round settles.
+
 # WAITING ON LEIGH
 
 - **Site review** — the current pause; feedback may spawn one more work round.
@@ -117,6 +145,8 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
 # CUTOVER (phase 5 runbook)
 
 *Note (2026-08-09): preview and the apex are the same Worker and the same D1 database — cutover only adds the apex custom domain (step 4). Content on preview IS the content that goes live; there is no separate content-migration step. The item-21 copy (meta description, photography body, visitor Q&A) is already in the shared D1.*
+
+*Pre-cutover content task (2026-08-09, item 25): the Visitors section launches on interim Lifestyle-category photos. Before go-live, Caveshen curates and uploads proper vacation/visitor photos via admin and tags the gallery's Vacation category (21d) — no code involved.*
 
 In rough order:
 

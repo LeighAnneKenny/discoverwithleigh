@@ -6,7 +6,7 @@ import Gallery from '../components/Gallery.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Video from '../components/Video.astro';
 import Marketing from '../components/Marketing.astro';
-import Influencer from '../components/Influencer.astro';
+import Visitors from '../components/Visitors.astro';
 import Reviews from '../components/Reviews.astro';
 import Brands from '../components/Brands.astro';
 import Contact from '../components/Contact.astro';
@@ -62,8 +62,8 @@ const faqLd = publicQa.length && {
   <CtaBand line={c.video.cta.line} label={c.video.cta.label} />
   <Marketing marketing={c.marketing} />
   <CtaBand line={c.marketing.cta.line} label={c.marketing.cta.label} />
-  <Influencer influencer={c.influencer} />
-  <CtaBand line={c.influencer.cta.line} label={c.influencer.cta.label} />
+  <Visitors visitors={c.visitors} gallery={gallery} />
+  <CtaBand line={c.visitors.cta.line} label={c.visitors.cta.label} />
   <Reviews reviews={c.reviews} />
   <Brands items={brands} />
   <Contact contact={c.contact} socials={c.socials} />

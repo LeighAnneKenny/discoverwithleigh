@@ -15,7 +15,7 @@ const EXACT = new Set([
   'section:photography',
   'section:video',
   'section:marketing',
-  'section:influencer',
+  'section:vacation',
   'section:reviews',
   'section:brands',
   'section:contact',

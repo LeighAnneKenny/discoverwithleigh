@@ -19,7 +19,7 @@ export const nav = [
   { label: 'Photography', href: '#photography' },
   { label: 'Video', href: '#video' },
   { label: 'Marketing', href: '#marketing' },
-  { label: 'Influencer', href: '#influencer' },
+  { label: 'Vacation', href: '#vacation' },
   { label: 'Contact', href: '#contact' },
 ] as const;
 
@@ -104,14 +104,16 @@ export const marketing = {
   cta: { line: 'Let’s create a powerful social media strategy', label: 'Get started here' },
 };
 
-export const influencer = {
-  eyebrow: 'Amplify your brand’s reach',
-  heading: 'Influencer Campaigns',
+export const visitors = {
+  eyebrow: 'Here on holiday?',
+  heading: 'Vacation Photography',
   body: [
-    'Unlock your brand’s potential by partnering with me for your next influencer campaign! From unboxings and product reviews to customer experience videos, my content authentically connects with a loyal community that trusts my recommendations.',
-    'Let’s showcase your business in a genuine way and elevate your brand beyond traditional advertising.',
+    'Cape Town might be the most photogenic city on earth, and you should be in the pictures. I photograph travellers all over the city: couples, families, proposals and special occasions, at your accommodation or out on location, from the beaches and mountains to the vineyards and the waterfront.',
+    'Sessions are built around your stay, not the other way round. Tell me your dates and what you have in mind, and I’ll plan a shoot that fits your itinerary. Your edited gallery comes back within days, often while you’re still here.',
   ],
-  cta: { line: 'Time to unlock your brand’s potential!', label: 'Get started here' },
+  cta: { line: 'Let’s make your trip unforgettable.', label: 'Get started here' },
+  // empty by default — real picks live in the D1 content row; resolution + fallback in Visitors.astro
+  printIds: [] as number[],
 };
 
 export const reviews = [

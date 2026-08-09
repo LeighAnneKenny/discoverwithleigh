@@ -10,7 +10,7 @@ const shape = {
   photography: defaults.photography,
   video: defaults.video,
   marketing: defaults.marketing,
-  influencer: defaults.influencer,
+  visitors: defaults.visitors,
   reviews: defaults.reviews,
   contact: defaults.contact,
   socials: defaults.socials,

@@ -48,7 +48,7 @@ const shape = {
   photography: site.photography,
   video: site.video,
   marketing: site.marketing,
-  influencer: site.influencer,
+  visitors: site.visitors,
   reviews: site.reviews,
   contact: site.contact,
   socials: site.socials,
@@ -98,12 +98,12 @@ const RENDERS = new Set([
   'marketing.process[*].text',
   'marketing.cta.line',
   'marketing.cta.label',
-  // influencer
-  'influencer.eyebrow',
-  'influencer.heading',
-  'influencer.body',
-  'influencer.cta.line',
-  'influencer.cta.label',
+  // visitors
+  'visitors.eyebrow',
+  'visitors.heading',
+  'visitors.body',
+  'visitors.cta.line',
+  'visitors.cta.label',
   // reviews
   'reviews[*].quote',
   'reviews[*].name',
@@ -129,6 +129,7 @@ const EXEMPTIONS: Record<string, string> = {
   'socials[*].show': 'boolean flag — gates whether the link is included in the rendered list (not a value in output)',
   'qa[*].show': 'boolean flag — gates Q&A widget item visibility (not a value in output)',
   'qa[*].public': 'boolean flag — gates llms.txt / FAQ JSON-LD inclusion only; HTML output is driven by show, not public',
+  'visitors.printIds': 'number array — ids resolve through gallery lookup to img src attrs; the id values themselves are not text output; empty default falls back to Lifestyle first-five (PRD item 25)',
 };
 
 describe('content shape exhaustiveness', () => {
