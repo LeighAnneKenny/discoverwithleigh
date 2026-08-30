@@ -136,7 +136,7 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
     - **Pause + auto-resume:** a small script (the component's first). A touch pauses both rows by converting each animation's progress into `scrollLeft` — translate −X on a duplicated track paints the same frame as scrollLeft X, so the handoff is seamless both ways. Two seconds after the last touch or momentum-scroll event, the animations resume from wherever each strip was left. Reduced-motion users keep the static scrollable strips; the script stands down.
     - **Tests:** item 20's hover test branches on form factor — mobile asserts a tap does *not* grey the strip (the reported bug as a regression test); a new mobile-only test covers swipeability, the touch pause, and the auto-resume.
     - **A11y:** the scrollers get `tabindex`/`role`/`aria-label` via the script wherever the CSS makes them scrollable (axe: scrollable-region-focusable) — keyboard users can arrow-scroll them.
-    - *Status 2026-08-30: built inline; 38 API + 94 UI green (3 skips = the touch test on desktop profiles). Awaiting Caveshen's local-dev look before commit + preview deploy.*
+    - *Status 2026-08-30: built inline; 38 API + 94 UI green (3 skips = the touch test on desktop profiles). Approved by Caveshen; committed + pushed 93ed187, deployed to preview (worker version 4bad813f).*
 
 # WAITING ON LEIGH
 
