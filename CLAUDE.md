@@ -64,6 +64,9 @@ npx wrangler d1 migrations apply discoverwithleigh --local   # + --remote before
   rule beside a marquee-wide pause rule froze one row and lit the other.
 - Ask about force-dark browser extensions before repainting colour work. A "brown
   background" bug once turned out to be Dark Reader re-tinting the page.
+- Gate `:hover` rules behind `@media (hover: hover)` — on touchscreens `:hover`
+  sticks after a tap (a tap froze the brands marquee until the next tap elsewhere).
+  Playwright's mobile profiles report `hover: none`, so tests must branch too.
 
 ## Working practices
 

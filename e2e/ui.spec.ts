@@ -174,6 +174,16 @@ test('brands strip: colour by default, hover greys the rest (item 20)', async ({
   expect(await filterOf(hovered), 'colour by default').toBe('none');
   expect(await filterOf(rowMate), 'colour by default').toBe('none');
 
+  if (isMobile(page)) {
+    // Touch reports hover:none, so the grey-out is gated off (item 27) — a tap
+    // must not grey the strip (sticky :hover was the reported freeze bug).
+    await hovered.tap();
+    await page.waitForTimeout(400); // outlast the 0.3s filter transition
+    expect(await filterOf(hovered), 'tap does not grey').toBe('none');
+    expect(await filterOf(rowMate), 'tap does not grey row-mates').toBe('none');
+    return;
+  }
+
   // poll rather than sleep past the 0.3s transition — the filter is mid-flight
   // for a moment after each pointer move
   await hovered.hover();
@@ -183,6 +193,33 @@ test('brands strip: colour by default, hover greys the rest (item 20)', async ({
   await page.mouse.move(0, 0);
   await expect.poll(() => filterOf(rowMate), { message: 'colour restored after mouseout' }).toBe('none');
   expect(await filterOf(hovered), 'colour restored after mouseout').toBe('none');
+});
+
+test('brands strip: touch pauses, swipes, auto-resumes (item 27)', async ({ page }) => {
+  test.skip(!isMobile(page), 'touch-only behaviour');
+  // The real animation must run: the script hands it off to scrollLeft and back.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const marquee = page.locator('.film-marquee');
+  await marquee.scrollIntoViewIfNeeded();
+
+  // swipeable: each strip is a native scroll container wider than the viewport
+  const scroller = page.locator('#brands .strip-scroller').first();
+  expect(
+    await scroller.evaluate((el) => getComputedStyle(el).overflowX === 'auto' && el.scrollWidth > el.clientWidth),
+    'strip is natively swipeable',
+  ).toBe(true);
+
+  await marquee.tap();
+  await expect(marquee, 'touch pauses the marquee').toHaveClass(/is-swiping/);
+  // 2s after the last touch the animation takes back over
+  await expect(marquee, 'marquee resumes on its own').not.toHaveClass(/is-swiping/, { timeout: 4000 });
+  expect(
+    await page
+      .locator('#brands .strip-track--fwd')
+      .evaluate((el) => el.getAnimations()[0]?.playState),
+    'animation running again after resume',
+  ).toBe('running');
 });
 
 test('contact: fields stay inside their card, Turnstile present', async ({ page }) => {

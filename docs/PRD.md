@@ -130,6 +130,14 @@ Hero → About → Services overview → Photography (filterable gallery: Produc
     - **To resolve at spec time:** nav coupling (a hidden section's nav item and CtaBand must hide with it); machine surfaces (does hiding a section pull its line from llms.txt/JSON-LD? — presumably yes, same visibility rule as the Q&A `show`/`public` split); default state seeding; exhaustiveness-test exemptions.
     - **Not scheduled** — revisit after item 25 ships and Leigh's review round settles.
 
+27. **Film-strip touch behaviour — swipe + auto-resume.** *(First outside feedback on the site, 2026-08-30, via Caveshen: on mobile, a tap froze the strip and it only resumed after tapping elsewhere.)* Root cause: the pause and grey-out are `:hover` rules, and `:hover` sticks after a tap on touchscreens. All changes in `Brands.astro` plus test updates:
+    - **Hover rules gated to `@media (hover: hover)`** — pause and grey-out are desktop affordances; desktop behaviour unchanged.
+    - **Swipe:** each track gains a `.strip-scroller` wrapper; on touch devices it is a native horizontal scroller (hidden scrollbar, `overscroll-behavior-x: contain`), so the strips swipe with real momentum and the two rows swipe independently. The sprocket bands sit outside the scroller and keep full width — this also fixes the reduced-motion scroll mode, whose bands previously ended at the viewport edge.
+    - **Pause + auto-resume:** a small script (the component's first). A touch pauses both rows by converting each animation's progress into `scrollLeft` — translate −X on a duplicated track paints the same frame as scrollLeft X, so the handoff is seamless both ways. Two seconds after the last touch or momentum-scroll event, the animations resume from wherever each strip was left. Reduced-motion users keep the static scrollable strips; the script stands down.
+    - **Tests:** item 20's hover test branches on form factor — mobile asserts a tap does *not* grey the strip (the reported bug as a regression test); a new mobile-only test covers swipeability, the touch pause, and the auto-resume.
+    - **A11y:** the scrollers get `tabindex`/`role`/`aria-label` via the script wherever the CSS makes them scrollable (axe: scrollable-region-focusable) — keyboard users can arrow-scroll them.
+    - *Status 2026-08-30: built inline; 38 API + 94 UI green (3 skips = the touch test on desktop profiles). Awaiting Caveshen's local-dev look before commit + preview deploy.*
+
 # WAITING ON LEIGH
 
 - **Site review** — the current pause; feedback may spawn one more work round.

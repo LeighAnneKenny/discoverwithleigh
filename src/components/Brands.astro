@@ -44,30 +44,11 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     <div class="film-marquee" role="group" aria-label="Client brand logos">
 
       <div class="film-strip">
-        <div class="strip-track strip-track--fwd">
-          {[0, 1].map((dupHalf) => (
-            <div class="strip-half" aria-hidden={dupHalf === 1 ? 'true' : undefined}>
-              {topHalf.map(({ logo, frameNum, hiddenDup }) => (
-                <figure
-                  class="brand-tile"
-                  aria-hidden={dupHalf === 0 && hiddenDup ? 'true' : undefined}
-                >
-                  <span class="frame-num" aria-hidden="true">{frameNum}</span>
-                  <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
-                  {logo.label && <figcaption>{logo.label}</figcaption>}
-                </figure>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {!isSingle && (
-        <div class="film-strip">
-          <div class="strip-track strip-track--rev">
+        <div class="strip-scroller">
+          <div class="strip-track strip-track--fwd">
             {[0, 1].map((dupHalf) => (
               <div class="strip-half" aria-hidden={dupHalf === 1 ? 'true' : undefined}>
-                {botHalf.map(({ logo, frameNum, hiddenDup }) => (
+                {topHalf.map(({ logo, frameNum, hiddenDup }) => (
                   <figure
                     class="brand-tile"
                     aria-hidden={dupHalf === 0 && hiddenDup ? 'true' : undefined}
@@ -79,6 +60,29 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
                 ))}
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {!isSingle && (
+        <div class="film-strip">
+          <div class="strip-scroller">
+            <div class="strip-track strip-track--rev">
+              {[0, 1].map((dupHalf) => (
+                <div class="strip-half" aria-hidden={dupHalf === 1 ? 'true' : undefined}>
+                  {botHalf.map(({ logo, frameNum, hiddenDup }) => (
+                    <figure
+                      class="brand-tile"
+                      aria-hidden={dupHalf === 0 && hiddenDup ? 'true' : undefined}
+                    >
+                      <span class="frame-num" aria-hidden="true">{frameNum}</span>
+                      <img src={logo.url} width={logo.w} height={logo.h} alt="" loading="lazy" decoding="async" />
+                      {logo.label && <figcaption>{logo.label}</figcaption>}
+                    </figure>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -134,9 +138,13 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     gap: 3px;
   }
 
-  /* Pause both rows when hovering anywhere on the marquee */
-  .film-marquee:hover .strip-track {
-    animation-play-state: paused;
+  /* Pause both rows when hovering anywhere on the marquee.
+     Hover devices only: on touch, :hover sticks after a tap and froze the
+     strip until the user tapped elsewhere — touch pause lives in the script. */
+  @media (hover: hover) {
+    .film-marquee:hover .strip-track {
+      animation-play-state: paused;
+    }
   }
 
   /* ---- film strip: dark base + sprocket bands via ::before/::after ---- */
@@ -167,6 +175,27 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     background-size: 1.4rem 100%;
     background-origin: content-box;
     background-clip: content-box;
+  }
+
+  /* Touch devices swipe the strips natively; the script below pauses the
+     marquee while a finger is down and resumes 2s after the last activity.
+     The scroller wraps only the track, so the static sprocket bands keep
+     their full width while the frames scroll between them. */
+  @media (hover: none) {
+    .strip-scroller {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+    .strip-scroller::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Swipe mode (set by the script): animation off zeroes the translate so
+     each strip's position lives in scrollLeft instead. */
+  .film-marquee.is-swiping .strip-track {
+    animation: none;
   }
 
   /* ---- animated track ---- */
@@ -232,10 +261,12 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
      no link), and most sit inside aria-hidden marquee duplicates — making them
      focusable to mirror this on :focus-visible would add ~56 tab stops and trip
      axe's aria-hidden-focus rule. Add the :focus-visible twin if tiles ever
-     become links. */
-  .film-marquee:has(.brand-tile:hover) .brand-tile:not(:hover) img {
-    filter: grayscale(1) brightness(1.6);
-    opacity: 0.75;
+     become links. Hover devices only — see the pause rule above. */
+  @media (hover: hover) {
+    .film-marquee:has(.brand-tile:hover) .brand-tile:not(:hover) img {
+      filter: grayscale(1) brightness(1.6);
+      opacity: 0.75;
+    }
   }
 
   .brand-tile figcaption {
@@ -274,7 +305,9 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     .film-shadow::after {
       mask-image: none;
     }
-    .film-strip {
+    /* Scroll on the scroller, not .film-strip — keeps the sprocket bands
+       full-width instead of ending at the viewport edge when scrolled */
+    .strip-scroller {
       overflow-x: auto;
     }
     .strip-track {
@@ -287,3 +320,96 @@ const botHalf = isSingle ? [] : buildHalf(bottomItems, botRepeats, split);
     }
   }
 </style>
+
+<script>
+  // Touch companion to the hover-gated rules above. A touch pauses the marquee
+  // by handing each track to native scrolling — translate -X on a duplicated
+  // track paints the same frame as scrollLeft X — so a swipe browses the strip;
+  // 2s after the last touch or momentum-scroll event the animation takes back
+  // over from wherever each strip was left.
+  const marquee = document.querySelector<HTMLElement>('.film-marquee');
+  const touch = matchMedia('(hover: none)').matches;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Wherever the CSS makes the scrollers scrollable (touch always,
+  // reduced-motion everywhere), give them keyboard access + a name —
+  // axe: scrollable-region-focusable.
+  if (marquee && (touch || reduced)) {
+    marquee.querySelectorAll('.strip-scroller').forEach((el, i) => {
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'group');
+      el.setAttribute('aria-label', `Brand logos, row ${i + 1}, scrollable`);
+    });
+  }
+
+  if (marquee && touch && !reduced) {
+    const rows = [...marquee.querySelectorAll<HTMLElement>('.strip-scroller')].map((scroller) => ({
+      scroller,
+      track: scroller.querySelector<HTMLElement>('.strip-track')!,
+    }));
+    let swiping = false;
+    let touching = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    // Animation progress ↔ px the track sits left of its resting position.
+    // The reversed (bottom) row plays its keyframes backwards, hence 1 - p.
+    const half = (track: HTMLElement) => track.offsetWidth / 2;
+    const readX = (track: HTMLElement) => {
+      const anim = track.getAnimations()[0];
+      if (!anim) return 0;
+      const { duration, direction } = anim.effect!.getComputedTiming();
+      const p = (Number(anim.currentTime ?? 0) % (duration as number)) / (duration as number);
+      return (direction === 'reverse' ? 1 - p : p) * half(track);
+    };
+    const seekTo = (track: HTMLElement, x: number) => {
+      const anim = track.getAnimations()[0];
+      if (!anim) return;
+      const { duration, direction } = anim.effect!.getComputedTiming();
+      const p = direction === 'reverse' ? 1 - x / half(track) : x / half(track);
+      anim.currentTime = p * (duration as number);
+    };
+
+    const enterSwipe = () => {
+      if (swiping) return;
+      swiping = true;
+      const offsets = rows.map(({ track }) => readX(track));
+      marquee.classList.add('is-swiping'); // kills the animations — read first
+      rows.forEach(({ scroller }, i) => (scroller.scrollLeft = offsets[i]));
+    };
+    const resume = () => {
+      swiping = false;
+      const offsets = rows.map(({ scroller, track }) => scroller.scrollLeft % half(track));
+      marquee.classList.remove('is-swiping'); // fresh animations start at 0…
+      rows.forEach(({ scroller, track }, i) => {
+        seekTo(track, offsets[i]); // …seek each to where the user left it
+        scroller.scrollLeft = 0;
+      });
+    };
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(resume, 2000);
+    };
+
+    marquee.addEventListener(
+      'touchstart',
+      () => {
+        touching = true;
+        clearTimeout(timer);
+        enterSwipe();
+      },
+      { passive: true },
+    );
+    const release = (e: TouchEvent) => {
+      touching = e.touches.length > 0;
+      if (!touching) schedule();
+    };
+    marquee.addEventListener('touchend', release, { passive: true });
+    marquee.addEventListener('touchcancel', release, { passive: true });
+    for (const { scroller } of rows) {
+      // momentum after release keeps the pause alive until scrolling settles
+      scroller.addEventListener('scroll', () => swiping && !touching && schedule(), {
+        passive: true,
+      });
+    }
+  }
+</script>
